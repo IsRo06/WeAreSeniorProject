@@ -1,0 +1,21 @@
+Notes from development:
+
+Isa
+- The manifest.json file describes what the extension can do and also holds its configurations
+- In the manifest.json there's a section titled "Action" the default_popup is the html page that the extension will open
+- To test:
+    - Go to chrome://extensions
+    - Enable developer mode (Switch is in the top right)
+    - Choose the Load unpacked option
+    - Look for the  folder where the manifest.json file is in the file explorer(idk the apple version of file explorer sorry kath and david)
+    - The extension should show up in the list of extensions and it should act like any other extension :D Yipee
+- If you make any changes to the code you can just click the refresh button in the extensions card and it'll reflect
+
+Summer
+-
+Oscar
+-
+David
+-
+Kath
+-
