@@ -18,4 +18,5 @@ Oscar
 David
 -
 Kath
--
+- Images folder holds all photos and gifs used for pets as well as other relavant photos in the project.
+- Currently has a dog picture and gif ready for testing purposes.
