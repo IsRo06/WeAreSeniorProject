@@ -6,5 +6,10 @@
   "action": {
     "default_popup": "html/main.html",
     "default_icon": "assets/temp_logo.png"
+  },
+  "background": {
+	  "service_worker": "js/background.js",
+	  "type": "module"
   }
 }
+
