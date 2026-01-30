@@ -14,7 +14,7 @@ Isa
 Summer
 -
 Oscar
--
+-Added readme
 David
 - Added the permission in the manifest file since we will use storage later to save assignments
 - host permissions: we need canvas domain
