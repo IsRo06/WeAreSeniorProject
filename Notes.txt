@@ -23,4 +23,5 @@ David
     - To test and see the console log output hover on the three dots on the top right of chrome
         - Go to "More Tools" > "Developer Tools" -> should see a console at the bottom displayong some texts & array
 Kath
--
+- Images folder holds all photos and gifs used for pets as well as other relavant photos in the project.
+- Currently has a dog picture and gif ready for testing purposes.
