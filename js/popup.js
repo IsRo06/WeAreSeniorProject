@@ -3,10 +3,10 @@ const imageElement = document.getElementById('myImage');
 
 checkbox.addEventListener("change", () => {
 	if(checkbox.checked){
-		imageElement.src = '/Images/Dog/DogStatic.png';
+		imageElement.src = '/Images/Dog/DogWagTail.gif';
 	}
 	else{
-		imageElement.src = '/Images/Cat/CatStatic.png';
+		imageElement.src = '/Images/Cat/CatWagTail.gif';
 	}
 });
 
