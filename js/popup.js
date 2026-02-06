@@ -7,10 +7,10 @@ const imageElement = document.getElementById('myImage');
 
 checkbox.addEventListener("change", () => {
 	if(checkbox.checked){
-		imageElement.src = '/Images/Dog/DogWagTail.gif';
+		imageElement.src = '/assets/images/Dog/DogWagTail.gif';
 	}
 	else{
-		imageElement.src = '/Images/Cat/CatWagTail.gif';
+		imageElement.src = '/assets/images/Cat/CatWagTail.gif';
 	}
 });
 
