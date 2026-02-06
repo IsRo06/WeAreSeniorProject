@@ -12,10 +12,16 @@ Isa
 - If you make any changes to the code you can just click the refresh button in the extensions card and it'll reflect
 
 Summer
--
+- To run tests, do `npm test` from the main directory (that's it :D)
 Oscar
 -
 David
--
+- Added the permission in the manifest file since we will use storage later to save assignments
+- host permissions: we need canvas domain
+- content_scripts: injected into Canvas pages to parse everything
+- content.js was updated to detect Canvas Page and parse the visible To Do Items in the right sidebar
+    - To test and see the console log output hover on the three dots on the top right of chrome
+        - Go to "More Tools" > "Developer Tools" -> should see a console at the bottom displayong some texts & array
 Kath
--
+- Images folder holds all photos and gifs used for pets as well as other relavant photos in the project.
+- Currently has a dog picture and gif ready for testing purposes.
