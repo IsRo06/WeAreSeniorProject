@@ -23,5 +23,10 @@
     "default_popup": "html/main.html",
     "default_icon": "assets/temp_logo.png",
     "default_title": "Canvas Pet"
+  },
+  "background": {
+	  "service_worker": "js/background.js",
+	  "type": "module"
   }
 }
+

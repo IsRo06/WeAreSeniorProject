@@ -12,7 +12,7 @@ Isa
 - If you make any changes to the code you can just click the refresh button in the extensions card and it'll reflect
 
 Summer
--
+- To run tests, do `npm test` from the main directory (that's it :D)
 Oscar
 -Added readme
 David
