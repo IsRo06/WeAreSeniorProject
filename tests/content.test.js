@@ -115,9 +115,6 @@ test("Testing if it parses to do list items", async () => {
 
 });
 
-
-
-test("Testing the waiting for elements", async () => {
-
-});
+// Testing wait for element seemed kind of silly because it's just a timer waiting
+// for elements to appear
 
