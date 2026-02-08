@@ -22,6 +22,9 @@ test("Return if the domain is instructure", async () => {
 
 
 
+// Completely commenting these out because apparently the functions in
+// question were just temporary examples :\
+/*
 test("Tests if it parses a complete todo item", () => {
 	const li = document.createElement("li");
 	li.innerHTML = `
@@ -114,6 +117,7 @@ test("Testing if it parses to do list items", async () => {
 
 
 });
+*/
 
 // Testing wait for element seemed kind of silly because it's just a timer waiting
 // for elements to appear
