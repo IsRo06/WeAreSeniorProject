@@ -6,16 +6,16 @@ let assignments = null;
 
 
 console.log("Canvas Pet content.js loaded");
-isDomainCanvas();
+if(isDomainCanvas()){
+	startExtension();
+}
 
-function isDomainCanvas() {
-   if (location.hostname.includes("instructure.com")) {
-        startExtension();
-   }
+export function isDomainCanvas() {
+	return location.hostname.includes("instructure.com"); 
 }
 
 // start the extension
-function startExtension() {
+export function startExtension() {
     console.log("This is Canvas! Incoming Pets!");
 
     console.log("Page title: ", document.title);
@@ -27,7 +27,7 @@ function startExtension() {
 }
 
 // Parses to do list on the right sidebar
-function parseTodoItem(li) {
+export function parseTodoItem(li) {
     const info = li.querySelector('[data-testid="todo-sidebar-item-info"]');
     if (!info) return null;
 
@@ -47,7 +47,7 @@ function parseTodoItem(li) {
 }
 
 
-function parseTodoList() {
+export function parseTodoList() {
     const list = document.querySelector("#planner-todosidebar-item-list");
     if (!list) {
       console.warn("To-Do list not found yet.");
@@ -63,7 +63,7 @@ function parseTodoList() {
 
 // Function to wait for something specific to show on screen
 
-function waitForElement(selector, timeout = 10000) {
+export function waitForElement(selector, timeout = 10000) {
     return new Promise((resolve, reject) => {
      const start = Date.now();
      const interval = setInterval(() => {
@@ -76,6 +76,6 @@ function waitForElement(selector, timeout = 10000) {
           reject(new Error("Timed out waiting for " + selector));
          }
      }, 200);
-     });
+	});
 }
 
