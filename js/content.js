@@ -64,14 +64,35 @@ function renderSomething(element){
 	const title = document.createElement("h2");
 	const petImg = document.createElement("img");
 
+	const petToggleLabel = document.createElement("label");
+	const petToggleCheck = document.createElement("input");
+
 	title.textContent = "Welcome to Canvas Pets!";
 	
-	const imgPath = chrome.runtime.getURL("/assets/images/Cat/CatWagTail.gif");
-	petImg.src = imgPath;
-	// petImg.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM-jA8FkSx5JJ9TOhYGysDP5NaUnkKWCS28Q&s';
+	const catPath = chrome.runtime.getURL("/assets/images/Cat/CatWagTail.gif");
+	const dogPath = chrome.runtime.getURL("/assets/images/Dog/DogWagTail.gif");
+	petImg.src = catPath;
 	petImg.alt = 'Image of cat wagging tail';
+	petImg.id = 'petImg';
+
+	petToggleLabel.for = "petToggle";
+	petToggleLabel.textContent = "Check to switch pet";
+	petToggleCheck.type = "checkbox";
+	petToggleCheck.id = "petToggle";
+	petToggleCheck.addEventListener("change", () => {
+		if(petToggleCheck.checked){
+			petImg.src = dogPath;
+		}
+		else{
+			petImg.src = catPath;
+		}
+	});
+
+
 	canvasPets.appendChild(title);
 	canvasPets.appendChild(petImg);
+	canvasPets.appendChild(petToggleCheck);
+	canvasPets.appendChild(petToggleLabel);
 
 	element.insertAdjacentElement("beforebegin", canvasPets);
 }
