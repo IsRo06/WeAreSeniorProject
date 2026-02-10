@@ -57,33 +57,23 @@ async function getPlannerItems() {
 
 function renderSomething(element){
 	if(!element){
-		console.log("Alas");
 		return;
 	}
-	console.log("We're here");
 
-	const text = element.textContent;
-	const wordMatchRegExp = /[^\s]+/g; // Regular expression
-	const words = text.matchAll(wordMatchRegExp);
-	// matchAll returns an iterator, convert to array to get word count
-	const wordCount = [...words].length;
-	const readingTime = Math.round(wordCount / 200);
-	const badge = document.createElement("p");
-	console.log("Because we're here");
-	badge.textContent = `YO HO HO HO HO`;
-	/*
-	// Use the same styling as the publish information in an article's header
-	badge.classList.add("color-secondary-text", "type--caption");
-	badge.textContent = `⏱️ ${readingTime} min read`;
+	const canvasPets = document.createElement("div");
+	const title = document.createElement("h2");
+	const petImg = document.createElement("img");
 
-	// Support for API reference docs
-	const heading = article.querySelector("h1");
-	// Support for article docs with date
-	const date = article.querySelector("time")?.parentNode;
+	title.textContent = "Welcome to Canvas Pets!";
+	
+	const imgPath = chrome.runtime.getURL("/assets/images/Cat/CatWagTail.gif");
+	petImg.src = imgPath;
+	// petImg.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTM-jA8FkSx5JJ9TOhYGysDP5NaUnkKWCS28Q&s';
+	petImg.alt = 'Image of cat wagging tail';
+	canvasPets.appendChild(title);
+	canvasPets.appendChild(petImg);
 
-	(date ?? heading).insertAdjacentElement("afterend", badge);
-	*/
-	element.insertAdjacentElement("afterend", badge);
+	element.insertAdjacentElement("beforebegin", canvasPets);
 }
 
 renderSomething(document.querySelector("aside"));
