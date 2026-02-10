@@ -55,7 +55,26 @@ async function getPlannerItems() {
 }
 
 
-function renderSomething(element){
+function getAnimalPaths(){
+	const catNormalPath = chrome.runtime.getURL("/Images/Cat/CatWagTail.gif");
+	const catHappyPath = chrome.runtime.getURL("/Images/Cat/CatHappy.gif");
+	const dogNormalPath = chrome.runtime.getURL("/Images/Dog/DogTailWag.gif");
+	const dogHappyPath = chrome.runtime.getURL("/Images/Dog/Happy Dog.gif");
+
+	return {
+		cat: {
+			normal: catNormalPath,
+			happy:  catHappyPath,
+		},
+		dog: {
+			normal: dogNormalPath,
+			happy:  dogHappyPath,
+		}
+	};
+
+}
+
+function renderCanvasPets(element){
 	if(!element){
 		return;
 	}
@@ -64,40 +83,66 @@ function renderSomething(element){
 	const title = document.createElement("h2");
 	const petImg = document.createElement("img");
 
+	const toggleLabel = document.createElement("p");
 	const petToggleLabel = document.createElement("label");
 	const petToggleCheck = document.createElement("input");
+	const checkSpace = document.createElement("br");
+	const moodToggleLabel = document.createElement("label");
+	const moodToggleCheck = document.createElement("input");
 
 	title.textContent = "Welcome to Canvas Pets!";
 	
-	const catPath = chrome.runtime.getURL("/assets/images/Cat/CatWagTail.gif");
-	const dogPath = chrome.runtime.getURL("/assets/images/Dog/DogWagTail.gif");
-	petImg.src = catPath;
+	const animalPaths = getAnimalPaths();
+	petImg.src = animalPaths["cat"]["normal"];
 	petImg.alt = 'Image of cat wagging tail';
 	petImg.id = 'petImg';
 
+	toggleLabel.textContent = "Modify Pet!";
+
 	petToggleLabel.for = "petToggle";
-	petToggleLabel.textContent = "Check to switch pet";
+	petToggleLabel.textContent = "Dog / Cat";
 	petToggleCheck.type = "checkbox";
 	petToggleCheck.id = "petToggle";
+
+	moodToggleLabel.for = "moodToggle";
+	moodToggleLabel.textContent = "Happy";
+	moodToggleCheck.type = "checkbox";
+	moodToggleCheck.id = "moodToggle";
+
 	petToggleCheck.addEventListener("change", () => {
-		if(petToggleCheck.checked){
-			petImg.src = dogPath;
-		}
-		else{
-			petImg.src = catPath;
-		}
+		updatePet(petToggleCheck, moodToggleCheck, petImg)
 	});
+	moodToggleCheck.addEventListener("change", () => {
+		updatePet(petToggleCheck, moodToggleCheck, petImg)
+	});
+	
 
 
 	canvasPets.appendChild(title);
 	canvasPets.appendChild(petImg);
+	canvasPets.appendChild(toggleLabel);
 	canvasPets.appendChild(petToggleCheck);
 	canvasPets.appendChild(petToggleLabel);
+	canvasPets.appendChild(checkSpace);
+	canvasPets.appendChild(moodToggleCheck);
+	canvasPets.appendChild(moodToggleLabel);
 
 	element.insertAdjacentElement("beforebegin", canvasPets);
 }
 
-renderSomething(document.querySelector("aside"));
+function updatePet(animalToggle, moodToggle, imageElement) {
+	const isDog = animalToggle.checked;
+	const isHappy = moodToggle.checked;
+
+	const animal = isDog ? "dog" : "cat";
+	const mood = isHappy ? "happy" : "normal";
+
+	const paths = getAnimalPaths();
+	console.log(paths[animal][mood]);
+	imageElement.src = paths[animal][mood];
+}
+
+renderCanvasPets(document.querySelector("aside"));
 
 
 /****** EXAMPLE TO PARSE TODO LIST ******/
