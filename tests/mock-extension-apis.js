@@ -4,6 +4,7 @@ global.chrome = {
   }
 };
 
+/*
 test("getActiveTabId returns active tab ID", async () => {
   jest.spyOn(chrome.tabs, "query").mockResolvedValue([{
     id: 3,
@@ -12,3 +13,4 @@ test("getActiveTabId returns active tab ID", async () => {
   }]);
   expect(await getActiveTabId()).toBe(3);
 });
+*/

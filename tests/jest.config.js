@@ -1,20 +1,13 @@
-import {defineConfig} from 'eslint/config';
-import globals from 'globals';
+/*
+export default {
+  testEnvironment: "node",
+  setupFiles: ["/tests/__mocks__/chrome.js"]
+};
+*/
 
-export default defineConfig([
-  {
-    files: ['**/*.js'],
-    languageOptions: {
-      globals: {
-        ...globals.jest,
-      },
-    },
-    rules: {
-      'no-unused-vars': 'warn',
-      'no-undef': 'warn',
-    },
-  },
-]);
-// module.exports = {
-//  setupFiles: ['<rootDir>/mock-extension-apis.js']
-// };
+module.exports = {
+	rootDir: "..",
+	setupFiles: ["<rootDir>/tests/__mocks__/chrome.js"]
+};
+
+
