@@ -86,6 +86,7 @@ function renderCanvasPets(element){
 	const petStats = createPetStats();
 
 	title.textContent = "Welcome to Canvas Pets!";
+	title.style.textAlign = "center";
 	
 
 	canvasPets.appendChild(title);
@@ -98,6 +99,8 @@ function renderCanvasPets(element){
 function createPetImages(){
 	const parentDoc = document.createElement("div");
 
+	const petScene = document.createElement("div");
+
 	const motivationMsg = document.createElement("p");
 	const petImg = document.createElement("img");
 
@@ -109,6 +112,24 @@ function createPetImages(){
 	const moodToggleCheck = document.createElement("input");
 
 	motivationMsg.textContent = "I am motivating!";
+
+	parentDoc.style.backgroundColor = "#ffa362";
+	parentDoc.style.borderRadius = "5px";
+	parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+	parentDoc.style.padding = "5px";
+	parentDoc.style.margin = "10px";
+
+	petScene.style.backgroundColor = "#FFF585";
+	petScene.style.padding = "10px";
+	petScene.style.borderRadius = "5px";
+
+	motivationMsg.style.backgroundColor = "white";
+	motivationMsg.style.textAlign = "left";
+	motivationMsg.style.marginLeft = "auto";
+	motivationMsg.style.marginRight = "auto";
+	motivationMsg.style.borderRadius = "3px";
+	motivationMsg.style.width = "50%";
+	motivationMsg.style.padding = "5px";
 
 	const animalPaths = getAnimalPaths();
 	petImg.src = animalPaths["cat"]["normal"];
@@ -134,8 +155,9 @@ function createPetImages(){
 		updatePet(petToggleCheck, moodToggleCheck, petImg)
 	});
 
-	parentDoc.appendChild(motivationMsg);
-	parentDoc.appendChild(petImg);
+	parentDoc.appendChild(petScene);
+	petScene.appendChild(motivationMsg);
+	petScene.appendChild(petImg);
 	parentDoc.appendChild(toggleLabel);
 	parentDoc.appendChild(petToggleCheck);
 	parentDoc.appendChild(petToggleLabel);
@@ -153,7 +175,16 @@ function createPetStats(){
 	const moodStatBar = createStatBar("Mood", 85);
 	const wellbeingStatBar = createStatBar("Well-being", 40);
 
+	parentDoc.style.backgroundColor = "#ffa362";
+	parentDoc.style.borderRadius = "5px";
+	parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+	parentDoc.style.padding = "5px";
+	parentDoc.style.margin = "10px";
+
 	header.textContent = "Pet Stats";
+	header.style.textAlign = 'center';
+	header.style.padding = '0px';
+	header.style.color = "white";
 
 	parentDoc.appendChild(header);
 	parentDoc.appendChild(moodStatBar);
@@ -170,30 +201,40 @@ function createStatBar(label, percent){
 	const barFill = document.createElement("div");
 	const percentNum = document.createElement("p");
 
+	statBar.style.padding = "0 5px 0 5px";
+
 	statLabel.textContent = label;
 	percentNum.textContent = percent + "%";
 
 	statLabel.style.textAlign = 'center';
 	statLabel.style.fontWeight = 'bold';
+	statLabel.style.padding = '0px';
+	statLabel.style.margin = '0px';
+	statLabel.style.color = "white";
+
+	percentNum.style.color = "white";
+
 
 	bar.style.display = 'flex';
 	bar.style.width = "auto";
 	bar.style.flexDirection = 'row';
 	bar.style.alignItems = "center";
-	bar.style.padding = "5px";
+	bar.style.padding = '0px';
 	bar.style.gap = "5px";
+	bar.style.margin = '0px';
 
-	barBg.style.backgroundColor = '#b3b3b3';
+	barBg.style.backgroundColor = '#dddddd';
 	barBg.style.height = '20px';
 	barBg.style.width = '100%';
 	barBg.style.display = 'flex';
 	barBg.style.alignItems = 'center';
 	barBg.style.borderRadius = '10px'
 
-	barFill.style.backgroundColor = '#1b8c22';
+	barFill.style.backgroundColor = '#4ec67f';
 	barFill.style.height = '100%';
 	barFill.style.width = percent + "%";
 	barFill.style.borderRadius = '10px'
+
 
 
 	statBar.appendChild(statLabel);
