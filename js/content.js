@@ -5,7 +5,19 @@ const domain = window.location.origin;
 let assignments = null;
 
 
+let isDog = false;
+
 console.log("Canvas Pet content.js loaded");
+
+chrome.storage.onChanged.addListener((changes, area) => {
+	if(area === 'local' &&  changes.dogSelected) {
+		const newValue = changes.dogSelected.newValue;
+		isDog = newValue;
+		console.log("Is Dog: " + isDog);
+	}
+});
+
+
 isDomainCanvas();
 
 function isDomainCanvas() {
@@ -104,10 +116,9 @@ function createPetImages(){
 	const motivationMsg = document.createElement("p");
 	const petImg = document.createElement("img");
 
-	const toggleLabel = document.createElement("p");
-	const petToggleLabel = document.createElement("label");
-	const petToggleCheck = document.createElement("input");
-	const checkSpace = document.createElement("br");
+	const petRefreshBtn = document.createElement("button");
+	const spacer = document.createElement("br");
+
 	const moodToggleLabel = document.createElement("label");
 	const moodToggleCheck = document.createElement("input");
 
@@ -132,36 +143,43 @@ function createPetImages(){
 	motivationMsg.style.padding = "5px";
 
 	const animalPaths = getAnimalPaths();
-	petImg.src = animalPaths["cat"]["normal"];
 	petImg.alt = 'Image of cat wagging tail';
 	petImg.id = 'petImg';
 
-	toggleLabel.textContent = "Modify Pet!";
 
-	petToggleLabel.for = "petToggle";
-	petToggleLabel.textContent = "Dog / Cat";
-	petToggleCheck.type = "checkbox";
-	petToggleCheck.id = "petToggle";
+	petRefreshBtn.style.backgroundColor = "#FFF585";
+	petRefreshBtn.style.border = "none";
+	petRefreshBtn.style.borderRadius = "5px";
+	petRefreshBtn.style.color = "#000";
+	petRefreshBtn.style.padding = "10px";
+	petRefreshBtn.style.textAlign = "center";
+	petRefreshBtn.style.cursor = "pointer";
+	petRefreshBtn.style.marginLeft = "auto";
+	petRefreshBtn.style.marginRight = "auto";
+	petRefreshBtn.style.marginTop = "4px";
+	petRefreshBtn.textContent = "Refresh Pet!";
+
 
 	moodToggleLabel.for = "moodToggle";
 	moodToggleLabel.textContent = "Happy";
 	moodToggleCheck.type = "checkbox";
 	moodToggleCheck.id = "moodToggle";
+	updatePet(moodToggleCheck, petImg); 
 
-	petToggleCheck.addEventListener("change", () => {
-		updatePet(petToggleCheck, moodToggleCheck, petImg)
-	});
 	moodToggleCheck.addEventListener("change", () => {
-		updatePet(petToggleCheck, moodToggleCheck, petImg)
+		updatePet(moodToggleCheck, petImg)
 	});
+
+	petRefreshBtn.addEventListener("change", () => {
+		updatePet(moodToggleCheck, petImg)
+	});
+
 
 	parentDoc.appendChild(petScene);
 	petScene.appendChild(motivationMsg);
 	petScene.appendChild(petImg);
-	parentDoc.appendChild(toggleLabel);
-	parentDoc.appendChild(petToggleCheck);
-	parentDoc.appendChild(petToggleLabel);
-	parentDoc.appendChild(checkSpace);
+	parentDoc.appendChild(petRefreshBtn);
+	parentDoc.appendChild(spacer);
 	parentDoc.appendChild(moodToggleCheck);
 	parentDoc.appendChild(moodToggleLabel);
 
@@ -246,12 +264,12 @@ function createStatBar(label, percent){
 }
 
 
-function updatePet(animalToggle, moodToggle, imageElement) {
-	const isDog = animalToggle.checked;
-	const isHappy = moodToggle.checked;
+function updatePet(moodToggle, imageElement) {
+	// const isDog = animalToggle.checked;
+	// const isHappy = moodToggle.checked;
 
 	const animal = isDog ? "dog" : "cat";
-	const mood = isHappy ? "happy" : "normal";
+	const mood = moodToggle.checked ? "happy" : "normal";
 
 	const paths = getAnimalPaths();
 	console.log(paths[animal][mood]);

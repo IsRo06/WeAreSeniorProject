@@ -18,17 +18,25 @@ const PATHS = {
   }
 };
 
-function updatePet() {
-  const isDog = animalToggle.checked;
-  const isHappy = moodToggle.checked;
+chrome.storage.local.get(['dogSelected'], (data) => {
+	animalToggle.checked = !!data.dogSelected;
+	refreshImage();
+}); 
 
-  const animal = isDog ? "dog" : "cat";
-  const mood = isHappy ? "happy" : "normal";
+function refreshImage() {
+	const animal = animalToggle.checked ? "dog" : "cat";
+	const mood = moodToggle.checked ? "happy" : "normal";
 
-  imageElement.src = PATHS[animal][mood];
+	imageElement.src = PATHS[animal][mood];
 }
 
-updatePet();
+export function handleUserClick() {
+	refreshImage();
 
-animalToggle.addEventListener("change", updatePet);
-moodToggle.addEventListener("change", updatePet);
+	chrome.storage.local.set({dogSelected: animalToggle.checked});
+}
+
+
+animalToggle.addEventListener("change", handleUserClick);
+moodToggle.addEventListener("change", handleUserClick);
+
