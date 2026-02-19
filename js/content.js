@@ -170,7 +170,7 @@ function createPetImages(){
 		updatePet(moodToggleCheck, petImg)
 	});
 
-	petRefreshBtn.addEventListener("change", () => {
+	petRefreshBtn.addEventListener("click", () => {
 		updatePet(moodToggleCheck, petImg)
 	});
 
