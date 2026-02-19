@@ -18,6 +18,8 @@
       "js": [
         "js/content.js"
       ],
+      "matches": [ "*://*.instructure.com/*"],
+      "js": ["js/content.js"],
       "run_at": "document_idle"
     }
   ],
@@ -31,3 +33,14 @@
     "type": "module"
   }
 }
+	  "service_worker": "js/background.js",
+	  "type": "module"
+  },
+  "web_accessible_resources": [
+	  {
+		  "resources": ["assets/*.png", "assets/*.jpg", "assets/*.gif", "Images/*.jpg", "Images/*.gif", "Images/*.png"],
+		  "matches": ["<all_urls>"]
+	  }
+  ]
+}
+
