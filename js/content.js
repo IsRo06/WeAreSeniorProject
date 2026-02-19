@@ -5,7 +5,19 @@ const domain = window.location.origin;
 let assignments = null;
 
 
+let isDog = false;
+
 console.log("Canvas Pet content.js loaded");
+
+chrome.storage.onChanged.addListener((changes, area) => {
+	if(area === 'local' &&  changes.dogSelected) {
+		const newValue = changes.dogSelected.newValue;
+		isDog = newValue;
+		console.log("Is Dog: " + isDog);
+	}
+});
+
+
 isDomainCanvas();
 
 function isDomainCanvas() {
@@ -81,61 +93,183 @@ function renderCanvasPets(element){
 
 	const canvasPets = document.createElement("div");
 	const title = document.createElement("h2");
+
+	const petImages = createPetImages();
+	const petStats = createPetStats();
+
+	title.textContent = "Welcome to Canvas Pets!";
+	title.style.textAlign = "center";
+	
+
+	canvasPets.appendChild(title);
+	canvasPets.appendChild(petImages);
+	canvasPets.appendChild(petStats);
+
+	element.insertAdjacentElement("beforebegin", canvasPets);
+}
+
+function createPetImages(){
+	const parentDoc = document.createElement("div");
+
+	const petScene = document.createElement("div");
+
+	const motivationMsg = document.createElement("p");
 	const petImg = document.createElement("img");
 
-	const toggleLabel = document.createElement("p");
-	const petToggleLabel = document.createElement("label");
-	const petToggleCheck = document.createElement("input");
-	const checkSpace = document.createElement("br");
+	const petRefreshBtn = document.createElement("button");
+	const spacer = document.createElement("br");
+
 	const moodToggleLabel = document.createElement("label");
 	const moodToggleCheck = document.createElement("input");
 
-	title.textContent = "Welcome to Canvas Pets!";
-	
+	motivationMsg.textContent = "I am motivating!";
+
+	parentDoc.style.backgroundColor = "#ffa362";
+	parentDoc.style.borderRadius = "5px";
+	parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+	parentDoc.style.padding = "5px";
+	parentDoc.style.margin = "10px";
+
+	petScene.style.backgroundColor = "#FFF585";
+	petScene.style.padding = "10px";
+	petScene.style.borderRadius = "5px";
+
+	motivationMsg.style.backgroundColor = "white";
+	motivationMsg.style.textAlign = "left";
+	motivationMsg.style.marginLeft = "auto";
+	motivationMsg.style.marginRight = "auto";
+	motivationMsg.style.borderRadius = "3px";
+	motivationMsg.style.width = "50%";
+	motivationMsg.style.padding = "5px";
+
 	const animalPaths = getAnimalPaths();
-	petImg.src = animalPaths["cat"]["normal"];
 	petImg.alt = 'Image of cat wagging tail';
 	petImg.id = 'petImg';
 
-	toggleLabel.textContent = "Modify Pet!";
 
-	petToggleLabel.for = "petToggle";
-	petToggleLabel.textContent = "Dog / Cat";
-	petToggleCheck.type = "checkbox";
-	petToggleCheck.id = "petToggle";
+	petRefreshBtn.style.backgroundColor = "#FFF585";
+	petRefreshBtn.style.border = "none";
+	petRefreshBtn.style.borderRadius = "5px";
+	petRefreshBtn.style.color = "#000";
+	petRefreshBtn.style.padding = "10px";
+	petRefreshBtn.style.textAlign = "center";
+	petRefreshBtn.style.cursor = "pointer";
+	petRefreshBtn.style.marginLeft = "auto";
+	petRefreshBtn.style.marginRight = "auto";
+	petRefreshBtn.style.marginTop = "4px";
+	petRefreshBtn.textContent = "Refresh Pet!";
+
 
 	moodToggleLabel.for = "moodToggle";
 	moodToggleLabel.textContent = "Happy";
 	moodToggleCheck.type = "checkbox";
 	moodToggleCheck.id = "moodToggle";
+	updatePet(moodToggleCheck, petImg); 
 
-	petToggleCheck.addEventListener("change", () => {
-		updatePet(petToggleCheck, moodToggleCheck, petImg)
-	});
 	moodToggleCheck.addEventListener("change", () => {
-		updatePet(petToggleCheck, moodToggleCheck, petImg)
+		updatePet(moodToggleCheck, petImg)
 	});
-	
+
+	petRefreshBtn.addEventListener("click", () => {
+		updatePet(moodToggleCheck, petImg)
+	});
 
 
-	canvasPets.appendChild(title);
-	canvasPets.appendChild(petImg);
-	canvasPets.appendChild(toggleLabel);
-	canvasPets.appendChild(petToggleCheck);
-	canvasPets.appendChild(petToggleLabel);
-	canvasPets.appendChild(checkSpace);
-	canvasPets.appendChild(moodToggleCheck);
-	canvasPets.appendChild(moodToggleLabel);
+	parentDoc.appendChild(petScene);
+	petScene.appendChild(motivationMsg);
+	petScene.appendChild(petImg);
+	parentDoc.appendChild(petRefreshBtn);
+	parentDoc.appendChild(spacer);
+	parentDoc.appendChild(moodToggleCheck);
+	parentDoc.appendChild(moodToggleLabel);
 
-	element.insertAdjacentElement("beforebegin", canvasPets);
+	return parentDoc;
 }
 
-function updatePet(animalToggle, moodToggle, imageElement) {
-	const isDog = animalToggle.checked;
-	const isHappy = moodToggle.checked;
+function createPetStats(){
+	const parentDoc = document.createElement("div");
+
+	const header = document.createElement("h3");
+	const moodStatBar = createStatBar("Mood", 85);
+	const wellbeingStatBar = createStatBar("Well-being", 40);
+
+	parentDoc.style.backgroundColor = "#ffa362";
+	parentDoc.style.borderRadius = "5px";
+	parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+	parentDoc.style.padding = "5px";
+	parentDoc.style.margin = "10px";
+
+	header.textContent = "Pet Stats";
+	header.style.textAlign = 'center';
+	header.style.padding = '0px';
+	header.style.color = "white";
+
+	parentDoc.appendChild(header);
+	parentDoc.appendChild(moodStatBar);
+	parentDoc.appendChild(wellbeingStatBar);
+
+	return parentDoc;
+}
+
+function createStatBar(label, percent){
+	const statBar = document.createElement("div");
+	const statLabel = document.createElement("p");
+	const bar = document.createElement("div");
+	const barBg = document.createElement("div");
+	const barFill = document.createElement("div");
+	const percentNum = document.createElement("p");
+
+	statBar.style.padding = "0 5px 0 5px";
+
+	statLabel.textContent = label;
+	percentNum.textContent = percent + "%";
+
+	statLabel.style.textAlign = 'center';
+	statLabel.style.fontWeight = 'bold';
+	statLabel.style.padding = '0px';
+	statLabel.style.margin = '0px';
+	statLabel.style.color = "white";
+
+	percentNum.style.color = "white";
+
+
+	bar.style.display = 'flex';
+	bar.style.width = "auto";
+	bar.style.flexDirection = 'row';
+	bar.style.alignItems = "center";
+	bar.style.padding = '0px';
+	bar.style.gap = "5px";
+	bar.style.margin = '0px';
+
+	barBg.style.backgroundColor = '#dddddd';
+	barBg.style.height = '20px';
+	barBg.style.width = '100%';
+	barBg.style.display = 'flex';
+	barBg.style.alignItems = 'center';
+	barBg.style.borderRadius = '10px'
+
+	barFill.style.backgroundColor = '#4ec67f';
+	barFill.style.height = '100%';
+	barFill.style.width = percent + "%";
+	barFill.style.borderRadius = '10px'
+
+
+
+	statBar.appendChild(statLabel);
+	statBar.appendChild(bar);
+	bar.appendChild(barBg);
+	barBg.appendChild(barFill);
+	bar.appendChild(percentNum);
+	return statBar;
+}
+
+
+function updatePet(moodToggle, imageElement) {
+	// const isDog = animalToggle.checked;
+	// const isHappy = moodToggle.checked;
 
 	const animal = isDog ? "dog" : "cat";
-	const mood = isHappy ? "happy" : "normal";
+	const mood = moodToggle.checked ? "happy" : "normal";
 
 	const paths = getAnimalPaths();
 	console.log(paths[animal][mood]);
