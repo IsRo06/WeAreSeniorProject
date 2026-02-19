@@ -3,18 +3,14 @@
   "description": "Base Level Extension",
   "version": "1.0",
   "manifest_version": 3,
-  "permissions": [
-    "storage", "activeTab"
-  ],
+  "permissions": ["storage", "activeTab"],
 
-  "host_permissions": [
-    "*://*.instructure.com/*"
-  ],
+  "host_permissions": ["*://*.instructure.com/*"],
 
   "content_scripts": [
     {
-      "matches": [ "*://*.instructure.com/*"],
-      "js": ["content.js"],
+      "matches": ["*://*.instructure.com/*"],
+      "js": ["config.js", "js/content.js"],
       "run_at": "document_idle"
     }
   ],
@@ -25,8 +21,20 @@
     "default_title": "Canvas Pet"
   },
   "background": {
-	  "service_worker": "js/background.js",
-	  "type": "module"
-  }
+    "service_worker": "js/background.js",
+    "type": "module"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/*.png",
+        "assets/*.jpg",
+        "assets/*.gif",
+        "Images/*.jpg",
+        "Images/*.gif",
+        "Images/*.png"
+      ],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
-
