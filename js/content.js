@@ -4,6 +4,26 @@
 const domain = window.location.origin;
 let assignments = null;
 
+// Storage helper to save and retrieve assignments from Chrome's local storage
+const Storage = {
+    async setAssignments(assignments) {
+        await chrome.storage.local.set({
+            assignments: assignments,
+            updatedAt: Date.now()
+        });
+
+        console.log("Assignments saved to storage");
+    },
+
+    async getAssignments() {
+        const { assignments, updatedAt } = await chrome.storage.local.get(["assignments", "updatedAt"]);
+
+        console.log("Retrieving assignments from storage: ", assignments);
+
+        return { assignments, updatedAt };
+    }
+
+};
 
 let isDog = false;
 
@@ -32,11 +52,11 @@ function startExtension() {
 
     console.log("Page title: ", document.title);
 
-    // Get planner items and log assignments to console once they are fetched
-    getPlannerItems().then(() => {
-        console.log("Assignments: ", assignments);
-    });
+    // Get assignments from storage or fetch from API if not available or outdated
+    getAssignmentsFromStorageOrFetch(getPlannerItems).then(assignments => {
+        console.log("Assignments ready for use: ", assignments);
 
+    })
 }
 
 async function getPlannerItems() {
@@ -62,10 +82,20 @@ async function getPlannerItems() {
     catch (error) {
         console.error("Error fetching planner items:", error);
     }
-
-
 }
 
+// get assignments from storage or fetch from API if not available or outdated
+async function getAssignmentsFromStorageOrFetch(getPlannerItems, fetchAgainTimer = 10 * 60 * 1000) {
+    const { assignments: storedAssignments, updatedAt } = await Storage.getAssignments();
+
+    // check if we need to fetch new assignments based on the last updated time and the defined timer
+    if (storedAssignments && updatedAt && (Date.now() - updatedAt < fetchAgainTimer)) {
+        console.log("Using cached assignments from storage");
+        assignments = storedAssignments;
+    } else {
+        console.log("No valid cached assignments found, fetching from API");
+        await getPlannerItems();
+        await Storage.setAssignments(assignments);
 
 function getAnimalPaths(){
 	const catNormalPath = chrome.runtime.getURL("/Images/Cat/CatWagTail.gif");
@@ -310,29 +340,8 @@ function parseTodoList() {
       return [];
     }
 
-    const items = Array.from(list.querySelectorAll(":scope > li"))
-     .map(parseTodoItem)
-     .filter(Boolean);
-
-    return items;
+    return assignments;
 }
 
-// Function to wait for something specific to show on screen
-
-function waitForElement(selector, timeout = 10000) {
-    return new Promise((resolve, reject) => {
-     const start = Date.now();
-     const interval = setInterval(() => {
-         const el = document.querySelector(selector);
-         if (el) {
-           clearInterval(interval);
-           resolve(el);
-         } else if (Date.now() - start > timeout) {
-          clearInterval(interval);
-          reject(new Error("Timed out waiting for " + selector));
-         }
-     }, 200);
-     });
-}
 
 */

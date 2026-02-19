@@ -4,27 +4,35 @@
   "version": "1.0",
   "manifest_version": 3,
   "permissions": [
-    "storage", "activeTab"
+    "storage",
+    "activeTab"
   ],
-
   "host_permissions": [
     "*://*.instructure.com/*"
   ],
-
   "content_scripts": [
     {
+      "matches": [
+        "*://*.instructure.com/*"
+      ],
+      "js": [
+        "js/content.js"
+      ],
       "matches": [ "*://*.instructure.com/*"],
       "js": ["js/content.js"],
       "run_at": "document_idle"
     }
   ],
-
   "action": {
     "default_popup": "html/main.html",
     "default_icon": "assets/temp_logo.png",
     "default_title": "Canvas Pet"
   },
   "background": {
+    "service_worker": "js/background.js",
+    "type": "module"
+  }
+}
 	  "service_worker": "js/background.js",
 	  "type": "module"
   },
