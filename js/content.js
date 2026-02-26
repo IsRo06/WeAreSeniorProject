@@ -4,41 +4,8 @@
 const domain = window.location.origin;
 let assignments = null;
 
-// Storage helper to save and retrieve assignments from Chrome's local storage
-const Storage = {
-  async setAssignments(assignments) {
-    await chrome.storage.local.set({
-      assignments: assignments,
-      updatedAt: Date.now(),
-    });
-
-    console.log("Assignments saved to storage");
-  },
-
-  async getAssignments() {
-    const { assignments, updatedAt } = await chrome.storage.local.get([
-      "assignments",
-      "updatedAt",
-    ]);
-
-    console.log("Retrieving assignments from storage: ", assignments);
-
-    return { assignments, updatedAt };
-  },
-};
-
-let isDog = false;
 
 console.log("Canvas Pet content.js loaded");
-
-chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && changes.dogSelected) {
-    const newValue = changes.dogSelected.newValue;
-    isDog = newValue;
-    console.log("Is Dog: " + isDog);
-  }
-});
-
 isDomainCanvas();
 
 function isDomainCanvas() {
@@ -71,9 +38,6 @@ function organizeAssignments(assignments) {
     } else {
       toDoAssignments.push(assignment);
     }
-  }
-
-  return { toDoAssignments, overdueAssignments };
 }
 
 // start the extension
@@ -186,8 +150,7 @@ function renderCanvasPets(element) {
   element.insertAdjacentElement("beforebegin", canvasPets);
 }
 
-function createPetImages() {
-  const parentDoc = document.createElement("div");
+    console.log("Page title: ", document.title);
 
   const petScene = document.createElement("div");
 
@@ -343,142 +306,89 @@ function createToDoList() {
       });
   });
 
-  return parentDoc;
 }
 
-function isWithinNext7Days(dueDateStr) {
-  const now = new Date();
-  const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const due = new Date(dueDateStr);
+async function getPlannerItems() {
+    // API endpoint to get planner items for a specific date range
+    // filtering for incomplete items
+    // limiting to 100 results per page
+    const url = domain + "/api/v1/planner/items" +
+        "?start_date=2026-02-04" + "&end_date=2026-02-16" +
+        "&filter=incomplete_items" + "&per_page=100";
 
-  return due >= now && due <= weekFromNow;
+    try {
+        let response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok: " + response.statusText);
+        }
+
+        let data = await response.json();
+
+        // Filter for assignments only
+        assignments = data.filter(item => item.plannable_type === "assignment");
+    }
+    catch (error) {
+        console.error("Error fetching planner items:", error);
+    }
+
+
 }
 
-function createPetStats() {
-  const parentDoc = document.createElement("div");
+/****** EXAMPLE TO PARSE TODO LIST ******/
+/*
 
-  const header = document.createElement("h3");
-  const moodStatBar = createStatBar("Mood", 85);
-  const wellbeingStatBar = createStatBar("Well-being", 40);
+// Parses to do list on the right sidebar
+function parseTodoItem(li) {
+    const info = li.querySelector('[data-testid="todo-sidebar-item-info"]');
+    if (!info) return null;
 
-  parentDoc.style.backgroundColor = "#ffa362";
-  parentDoc.style.borderRadius = "5px";
-  parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
-  parentDoc.style.padding = "5px";
-  parentDoc.style.margin = "10px";
+    const a = info.querySelector('[data-testid="todo-sidebar-item-title"] a');
+    const title = a?.textContent?.trim() ?? null;
 
-  header.textContent = "Pet Stats";
-  header.style.textAlign = "center";
-  header.style.padding = "0px";
-  header.style.color = "white";
+    const href = a?.getAttribute("href") ?? null;
+    const url = href ? new URL(href, location.origin).href : null;
 
-  parentDoc.appendChild(header);
-  parentDoc.appendChild(moodStatBar);
-  parentDoc.appendChild(wellbeingStatBar);
+    const course = info.querySelector("span.css-79wf76-text")?.textContent?.trim() ?? null;
 
-  return parentDoc;
+    const dueDteText = info
+        .querySelector('[data-testid="ToDoSidebarItem__InformationRow"] li')
+        ?.textContent?.trim() ?? null;
+
+    return { title, course, dueDteText, url };
 }
 
-function createStatBar(label, percent) {
-  const statBar = document.createElement("div");
-  const statLabel = document.createElement("p");
-  const bar = document.createElement("div");
-  const barBg = document.createElement("div");
-  const barFill = document.createElement("div");
-  const percentNum = document.createElement("p");
 
-  statBar.style.padding = "0 5px 0 5px";
+function parseTodoList() {
+    const list = document.querySelector("#planner-todosidebar-item-list");
+    if (!list) {
+      console.warn("To-Do list not found yet.");
+      return [];
+    }
 
-  statLabel.textContent = label;
-  percentNum.textContent = percent + "%";
+    const items = Array.from(list.querySelectorAll(":scope > li"))
+     .map(parseTodoItem)
+     .filter(Boolean);
 
-  statLabel.style.textAlign = "center";
-  statLabel.style.fontWeight = "bold";
-  statLabel.style.padding = "0px";
-  statLabel.style.margin = "0px";
-  statLabel.style.color = "white";
-
-  percentNum.style.color = "white";
-
-  bar.style.display = "flex";
-  bar.style.width = "auto";
-  bar.style.flexDirection = "row";
-  bar.style.alignItems = "center";
-  bar.style.padding = "0px";
-  bar.style.gap = "5px";
-  bar.style.margin = "0px";
-
-  barBg.style.backgroundColor = "#dddddd";
-  barBg.style.height = "20px";
-  barBg.style.width = "100%";
-  barBg.style.display = "flex";
-  barBg.style.alignItems = "center";
-  barBg.style.borderRadius = "10px";
-
-  barFill.style.backgroundColor = "#4ec67f";
-  barFill.style.height = "100%";
-  barFill.style.width = percent + "%";
-  barFill.style.borderRadius = "10px";
-
-  statBar.appendChild(statLabel);
-  statBar.appendChild(bar);
-  bar.appendChild(barBg);
-  barBg.appendChild(barFill);
-  bar.appendChild(percentNum);
-  return statBar;
+    return items;
 }
 
-function updatePet(moodToggle, imageElement) {
-  const animal = isDog ? "dog" : "cat";
-  const mood = moodToggle.checked ? "happy" : "normal";
+// Function to wait for something specific to show on screen
 
-  const paths = getAnimalPaths();
-  console.log(paths[animal][mood]);
-  imageElement.src = paths[animal][mood];
+function waitForElement(selector, timeout = 10000) {
+    return new Promise((resolve, reject) => {
+     const start = Date.now();
+     const interval = setInterval(() => {
+         const el = document.querySelector(selector);
+         if (el) {
+           clearInterval(interval);
+           resolve(el);
+         } else if (Date.now() - start > timeout) {
+          clearInterval(interval);
+          reject(new Error("Timed out waiting for " + selector));
+         }
+     }, 200);
+     });
 }
 
-//LLM stuff
-async function GetMotivation() {
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: "You are an encouraging virtual pet. Give a short 1-2 sentence motivational message to a student who is behind on their assignments. Be friendly and upbeat!",
-                },
-              ],
-            },
-          ],
-        }),
-      }
-    );
-
-    const data = await response.json();
-    console.log("Gemini response:", data);
-    return data.candidates[0].content.parts[0].text;
-  } catch (error) {
-    console.error("LLM Error:", error);
-    return "You got this!";
-  }
-}
-
-function displayMotivation(message, msgElement) {
-  if (msgElement) {
-    msgElement.textContent = message;
-  }
-}
-
-async function PromptLLM(msgElement) {
-  const motivationalMessage = await GetMotivation();
-  displayMotivation(motivationalMessage, msgElement);
-}
-
-renderCanvasPets(document.querySelector("aside"));
+*/
