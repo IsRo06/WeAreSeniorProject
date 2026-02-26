@@ -21,7 +21,7 @@
 
   "action": {
     "default_popup": "html/main.html",
-    "default_icon": "Images/Cat/CatStatic.png",
+    "default_icon": "assets/temp_logo.png",
     "default_title": "Canvas Pet"
   },
   "background": {
