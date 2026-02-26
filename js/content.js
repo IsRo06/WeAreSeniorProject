@@ -14,47 +14,14 @@ function isDomainCanvas() {
     }
 }
 
-function hideTodo() {
-  const style = document.createElement("style");
-  style.id = "hide-canvas-todo";
-  style.textContent = `
-    #right-side { display: none !important; }
-  `;
-  document.head.appendChild(style);
-}
-
-function organizeAssignments(assignments) {
-  const now = new Date();
-  let toDoAssignments = [];
-  let overdueAssignments = [];
-
-  if (!Array.isArray(assignments)) assignments = [];
-
-  for (let assignment of assignments) {
-    let dueDate = new Date(assignment.plannable_date);
-    if(dueDate < now) {
-      console.log(assignment)
-      overdueAssignments.push(assignment);
-    } else {
-      toDoAssignments.push(assignment);
-    }
-  }
-
-  return { toDoAssignments, overdueAssignments };
-}
-
-
-
 // start the extension
 function startExtension() {
   console.log("This is Canvas! Incoming Pets!");
 
   console.log("Page title: ", document.title);
-  
-  hideTodo();
 
   // Get assignments from storage or fetch from API if not available or outdated
-  let assignments = getAssignmentsFromStorageOrFetch(getPlannerItems).then((assignments) => {
+  getAssignmentsFromStorageOrFetch(getPlannerItems).then((assignments) => {
     console.log("Assignments ready for use: ", assignments);
   });
 }
@@ -140,7 +107,6 @@ function renderCanvasPets(element) {
 
   const petImages = createPetImages();
   const petStats = createPetStats();
-  const toDoList = createToDoList();
 
   title.textContent = "Welcome to Canvas Pets!";
   title.style.textAlign = "center";
@@ -148,7 +114,6 @@ function renderCanvasPets(element) {
   canvasPets.appendChild(title);
   canvasPets.appendChild(petImages);
   canvasPets.appendChild(petStats);
-  canvasPets.appendChild(toDoList);
 
 }
 
@@ -159,79 +124,6 @@ async function getPlannerItems() {
     const url = domain + "/api/v1/planner/items" +
         "?start_date=2026-02-04" + "&end_date=2026-02-16" +
         "&filter=incomplete_items" + "&per_page=100";
-
-function createToDoList() {
-
-  const parentDoc = document.createElement("div");
-
-  const header = document.createElement("h3");
-
-  parentDoc.style.backgroundColor = "#ffa362";
-  parentDoc.style.borderRadius = "5px";
-  parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
-  parentDoc.style.paddingTop = "12px";
-  parentDoc.style.paddingLeft = "12px";
-  parentDoc.style.paddingRight = "12px";
-  parentDoc.style.paddingBottom = "250px";
-  parentDoc.style.margin = "10px";
-
-  parentDoc.style.display = "flex";
-  parentDoc.style.flexDirection = "column";
-  parentDoc.style.alignItems = "center";
-  parentDoc.style.justifyContent = "flex-start";
-
-  header.textContent = "Upcoming Assignments";
-  header.style.textAlign = "center";
-  header.style.margin = "0";
-  header.style.color = "white";
-
-  parentDoc.appendChild(header);
-
-  getAssignmentsFromStorageOrFetch(getPlannerItems).then((assignments) => {
-    const { toDoAssignments } = organizeAssignments(assignments);
-
-    toDoAssignments.filter(a => isWithinNext7Days(a.plannable_date)).forEach((a) => {
-      const card = document.createElement("div");
-      const title = document.createElement("div");
-      const due = document.createElement("div");
-
-      title.textContent = a.plannable?.title || "Untitled";
-
-      const dueDate = new Date(a.plannable_date);
-      const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
-      due.textContent = dueDateDisplay.slice(0, -5);
-
-      card.style.backgroundColor = "#ff8f3f"; 
-      card.style.borderRadius = "5px";
-      card.style.padding = "8px 10px";
-      card.style.marginTop = "8px";
-      card.style.width = "100%";
-      card.style.color = "white";
-      card.style.boxSizing = "border-box";
-
-      card.style.display = "flex";
-      card.style.justifyContent = "space-between";
-      card.style.alignItems = "flex-start";
-
-      due.style.fontSize = "12px";
-      due.style.opacity = "0.9";
-
-      card.appendChild(title);
-      card.appendChild(due);
-      parentDoc.appendChild(card);
-    });
-  });
-
-  return parentDoc;
-}
-
-function isWithinNext7Days(dueDateStr) {
-  const now = new Date();
-  const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const due = new Date(dueDateStr);
-
-  return due >= now && due <= weekFromNow;
-}
 
 function createPetStats() {
   const parentDoc = document.createElement("div");
