@@ -4,7 +4,6 @@ console.log("Yeehaw! 2 + 2 = " + sum(2, 2));
 
 const selectBtn = document.getElementById("selectBtn");
 
-const animalToggle = document.getElementById("animalToggle");
 const moodToggle = document.getElementById("moodToggle");     
 const hungerToggle = document.getElementById("hungerToggle");
 
@@ -24,13 +23,7 @@ const PATHS = {
   },
 };
 
-chrome.storage.local.get(["dogSelected"], (data) => {
-  animalToggle.checked = !!data.dogSelected;
-  refreshImage();
-});
-
 function refreshImage() {
-  // const animal = animalToggle.checked ? "dog" : "cat";
   chrome.storage.local.get(["selectedPet"], (data) => {
 	  const animal = data.selectedPet || "cat";
 	  const mood = hungerToggle.checked ? "hungry"
@@ -42,11 +35,6 @@ function refreshImage() {
 		  catImg.src = PATHS["cat"][mood];
 	  }
   });
-}
-
-function handleAnimalToggle() {
-  chrome.storage.local.set({ dogSelected: animalToggle.checked });
-  refreshImage();
 }
 
 //mutually exclusive happy and hungry toggles
@@ -64,7 +52,6 @@ function handleHungryToggle() {
   refreshImage();
 }
 
-// animalToggle.addEventListener("change", handleAnimalToggle);
 moodToggle.addEventListener("change", handleHappyToggle);
 hungerToggle.addEventListener("change", handleHungryToggle);
 
