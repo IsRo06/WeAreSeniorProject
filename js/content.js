@@ -4,6 +4,12 @@
 const domain = window.location.origin;
 let assignments = null;
 
+const colorBg = "#094b80";
+const colorScene = "#6B9AC4";
+const colorBtn = "#F4B942";
+const colorBarBg = "#ddd";
+const colorBarGreen = "#659B5E";
+
 // Storage helper to save and retrieve assignments from Chrome's local storage
 const Storage = {
   async setAssignments(assignments) {
@@ -169,13 +175,13 @@ function createPetImages() {
   motivationMsg.textContent = "I am motivating!";
   motivationMsg.id = "pet-motivation-msg";
 
-  parentDoc.style.backgroundColor = "#ffa362";
+  parentDoc.style.backgroundColor = colorBg;
   parentDoc.style.borderRadius = "5px";
   parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
   parentDoc.style.padding = "5px";
   parentDoc.style.margin = "10px";
 
-  petScene.style.backgroundColor = "#FFF585";
+  petScene.style.backgroundColor = colorScene;
   petScene.style.padding = "10px";
   petScene.style.borderRadius = "5px";
 
@@ -183,7 +189,7 @@ function createPetImages() {
   motivationMsg.style.textAlign = "left";
   motivationMsg.style.marginLeft = "auto";
   motivationMsg.style.marginRight = "auto";
-  motivationMsg.style.borderRadius = "3px";
+  motivationMsg.style.borderRadius = "10px 10px 10px 1px";
   motivationMsg.style.width = "50%";
   motivationMsg.style.padding = "5px";
 
@@ -191,10 +197,10 @@ function createPetImages() {
   petImg.alt = "Image of cat wagging tail";
   petImg.id = "petImg";
 
-  petRefreshBtn.style.backgroundColor = "#FFF585";
+  petRefreshBtn.style.backgroundColor = colorBtn;
   petRefreshBtn.style.border = "none";
   petRefreshBtn.style.borderRadius = "5px";
-  petRefreshBtn.style.color = "#000";
+  petRefreshBtn.style.color = "black";
   petRefreshBtn.style.padding = "10px";
   petRefreshBtn.style.textAlign = "center";
   petRefreshBtn.style.cursor = "pointer";
@@ -203,10 +209,10 @@ function createPetImages() {
   petRefreshBtn.style.marginTop = "4px";
   petRefreshBtn.textContent = "Refresh Pet!";
 
-  petMotivateBtn.style.backgroundColor = "#FFF585";
+  petMotivateBtn.style.backgroundColor = colorBtn;
   petMotivateBtn.style.border = "none";
   petMotivateBtn.style.borderRadius = "5px";
-  petMotivateBtn.style.color = "#000";
+  petMotivateBtn.style.color = "black";
   petMotivateBtn.style.padding = "10px";
   petMotivateBtn.style.textAlign = "center";
   petMotivateBtn.style.cursor = "pointer";
@@ -217,6 +223,7 @@ function createPetImages() {
 
   moodToggleLabel.for = "moodToggle";
   moodToggleLabel.textContent = "Happy";
+  moodToggleLabel.style.color = "white";
   moodToggleCheck.type = "checkbox";
   moodToggleCheck.id = "moodToggle";
   updatePet(moodToggleCheck, petImg);
@@ -252,7 +259,7 @@ function createPetStats() {
   const moodStatBar = createStatBar("Mood", 85);
   const wellbeingStatBar = createStatBar("Well-being", 40);
 
-  parentDoc.style.backgroundColor = "#ffa362";
+  parentDoc.style.backgroundColor = colorBg;
   parentDoc.style.borderRadius = "5px";
   parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
   parentDoc.style.padding = "5px";
@@ -299,14 +306,14 @@ function createStatBar(label, percent) {
   bar.style.gap = "5px";
   bar.style.margin = "0px";
 
-  barBg.style.backgroundColor = "#dddddd";
+  barBg.style.backgroundColor = colorBarBg;
   barBg.style.height = "20px";
   barBg.style.width = "100%";
   barBg.style.display = "flex";
   barBg.style.alignItems = "center";
   barBg.style.borderRadius = "10px";
 
-  barFill.style.backgroundColor = "#4ec67f";
+  barFill.style.backgroundColor = colorBarGreen;
   barFill.style.height = "100%";
   barFill.style.width = percent + "%";
   barFill.style.borderRadius = "10px";
