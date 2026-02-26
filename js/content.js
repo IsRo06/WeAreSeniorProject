@@ -6,7 +6,7 @@ let assignments = null;
 
 const colorBg = "#094b80";
 const colorScene = "#6B9AC4";
-const colorBtn = "#F4B942";
+const colorBtn = "#2D0C11";
 const colorBarBg = "#ddd";
 const colorBarGreen = "#659B5E";
 
@@ -200,7 +200,7 @@ function createPetImages() {
   petRefreshBtn.style.backgroundColor = colorBtn;
   petRefreshBtn.style.border = "none";
   petRefreshBtn.style.borderRadius = "5px";
-  petRefreshBtn.style.color = "black";
+  petRefreshBtn.style.color = "white";
   petRefreshBtn.style.padding = "10px";
   petRefreshBtn.style.textAlign = "center";
   petRefreshBtn.style.cursor = "pointer";
@@ -212,7 +212,7 @@ function createPetImages() {
   petMotivateBtn.style.backgroundColor = colorBtn;
   petMotivateBtn.style.border = "none";
   petMotivateBtn.style.borderRadius = "5px";
-  petMotivateBtn.style.color = "black";
+  petMotivateBtn.style.color = "white";
   petMotivateBtn.style.padding = "10px";
   petMotivateBtn.style.textAlign = "center";
   petMotivateBtn.style.cursor = "pointer";
