@@ -1,8 +1,18 @@
 <html>
+	<link rel="stylesheet" href="../css/styles.css">
   <body>
     <h1>Canvas Pets</h1>
+	<div class="carousel">
+		<div class="carousel__item" data-pet="cat">
+			<img id="catImg" src="/Images/Cat/CatWagTail.gif" />
+		</div>
+		<div class="carousel__item" data-pet="dog">
+			<img id="dogImg" src="/Images/Dog/DogTailWag.gif" />
+		</div>
+	</div>
+	<button id="selectBtn">Select Pet</button>
+	<br/>
 
-    <img id="myImage" src="/Images/Cat/CatWagTail.gif" />
 
     <label>
       <input type="checkbox" id="animalToggle">
@@ -18,6 +28,7 @@
       <input type="checkbox" id="hungerToggle" />
       Hungry
     </label>
+
     
     <script type="module" src="/js/popup.js"></script>
   </body>

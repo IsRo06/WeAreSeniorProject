@@ -33,15 +33,15 @@ const Storage = {
   },
 };
 
-let isDog = false;
+let animalType = "cat";
 
 console.log("Canvas Pet content.js loaded");
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && changes.dogSelected) {
-    const newValue = changes.dogSelected.newValue;
-    isDog = newValue;
-    console.log("Is Dog: " + isDog);
+  if (area === "local" && changes.selectedPet) {
+    const newValue = changes.selectedPet.newValue;
+    animalType = newValue;
+    console.log("Animal Type: " + animalType);
   }
 });
 
@@ -327,7 +327,7 @@ function createStatBar(label, percent) {
 }
 
 function updatePet(moodToggle, imageElement) {
-  const animal = isDog ? "dog" : "cat";
+  const animal = animalType;
   const mood = moodToggle.checked ? "happy" : "normal";
 
   const paths = getAnimalPaths();
