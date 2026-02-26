@@ -2,14 +2,21 @@
 	<link rel="stylesheet" href="../css/styles.css">
   <body>
     <h1>Canvas Pets</h1>
-	<div class="carousel">
-		<div class="carousel__item" data-pet="cat">
-			<img id="catImg" src="/Images/Cat/CatWagTail.gif" />
+	<div class="carousel-wrapper">
+		<button class="carousel__arrow carousel__arrow--left" id="prevBtn">&#10094;</button>
+		<div class="carousel">
+
+			<div class="carousel__item" data-pet="cat">
+				<img id="catImg" src="/Images/Cat/CatWagTail.gif" />
+			</div>
+			<div class="carousel__item" data-pet="dog">
+				<img id="dogImg" src="/Images/Dog/DogTailWag.gif" />
+			</div>
+
 		</div>
-		<div class="carousel__item" data-pet="dog">
-			<img id="dogImg" src="/Images/Dog/DogTailWag.gif" />
-		</div>
+		<button class="carousel__arrow carousel__arrow--right" id="nextBtn">&#10095;</button>
 	</div>
+
 	<button id="selectBtn">Select Pet</button>
 	<br/>
 

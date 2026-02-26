@@ -19,20 +19,44 @@ h1 {
 	cursor: pointer;
 }
 
+.carousel-wrapper { 
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	background: #6B9AC4;
+	padding: 10px;
+	border-radius: 5px;
+	text-align: center;
+}
+
 .carousel {
   position: relative;
 }
 
+.carousel__arrow { 
+    border: none;
+	background: none;
+	color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    font-size: 40px;
+    transition: background 0.3s;
+    z-index: 10;
+}
+
+.carousel__arrow:hover {
+	color: rgba(255, 255, 255, 0.8);
+}
+
+
 .carousel__item {
   height: 80px;
-  width: 80px;
-  background: #6B9AC4;
+  width: 60px;
   padding: 1em;
   font-family: "Quicksand", sans-serif;
   font-weight: bold;
   font-size: 2em;
   text-align: center;
-  border-radius: 5px;
   color: #ffffff;
   display: none;
 }
