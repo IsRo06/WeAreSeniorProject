@@ -4,16 +4,31 @@ h1 {
 
 h2 {
 	font-size: 20px;
+	text-align: center;
 }
 
-h3 {
+.class-header{
+	width: 100%;
+	padding: 10px 0;
+	margin: 0 0 5px 0;
+	background-color: #094b80;
+	border-color: #094b80;
+	border-radius: 5px 5px 0 0;
+
+}
+
+.class-header h3{
+	text-align: center;
+	color: white;
 	font-size: 16px;
+	padding: 0;
+	margin: 0;
 }
 
 #selectBtn {
-	background-color: #3D0C11;
+	background-color: #094b80;
 	border-radius: 5px;
-	border-color: #3D0C11;
+	border-color: #094b80;
 	color: white;
 	border-width: 2px;
 	border-style: solid;
@@ -24,9 +39,9 @@ h3 {
 }
 
 #selectBtn:hover{
-	border-color: #3D0C11;
+	border-color: #094b80;
 	background-color: #FFFFFF;
-	color: #3D0C11;
+	color: #094b80;
 	cursor: pointer;
 }
 
@@ -103,21 +118,33 @@ h3 {
 .class-questions{
 	margin: 2px;
 	background: #ddd;
-	border-radius: 5px;
-	padding: 2px 10px;
+	border-radius: 10px 10px 5px 5px;
+	border-color: #094b80;
+	border-width: 2px;
+	border-style: solid;
+	padding: 0;
 }
 
 .class-prompt{
 	font-size: 14px;
 	font-weight: bold;
 	padding: 0;
+	margin: 0 2px; 
+}
+
+.class-prompt p{
+	padding 0;
+	margin: 0;
+}
+
+.questions-wrapper{
+	margin: 0 3px;
 }
 
 .likert{
 	display: flex;
 	flex-direction: column;
 	gap: 0;
-	padding: 3px 0;
 	margin: 5px 1px;
 }
 
@@ -153,4 +180,32 @@ h3 {
 	border-radius: 50%;
 	background: black;
 	border-color: blue;
+}
+
+.questionnaire-nav {
+	display: flex;
+	flex-direction: row;
+	margin: 4px;
+	justify-content: space-between;
+}
+
+
+.questionnaire-nav-btn {
+	background-color: #094b80;
+	border-radius: 5px;
+	border-color: #094b80;
+	color: white;
+	border-width: 2px;
+	border-style: solid;
+	margin-top: 5px;
+	width: 80px;
+	height: 30px;
+	font-size: 14px;
+}
+
+.questionnaire-nav-btn:hover{
+	border-color: #094b80;
+	background-color: white;
+	color: #094b80;
+	cursor: pointer;
 }

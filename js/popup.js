@@ -149,7 +149,10 @@ document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) =
 		});
 		question.insertAdjacentHTML("beforeend",
 			`
-			<p> Yo ho yo ho </p>
+			<div class="questionnaire-nav">
+				<button id="questionnaire-prev" class="questionnaire-nav-btn"> Previous </button>
+				<button id="questionnaire-prev" class="questionnaire-nav-btn"> Next </button>
+			</div>
 			`
 		);
 	});
