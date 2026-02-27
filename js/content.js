@@ -5,8 +5,9 @@ const domain = window.location.origin;
 let assignments = null;
 
 const colorBg = "#094b80";
+const colorBgDark = "#07375F";
 const colorScene = "#6B9AC4";
-const colorBtn = "#2D0C11";
+const colorBtn = colorBgDark; //"#2D0C11";
 const colorBarBg = "#ddd";
 const colorBarGreen = "#659B5E";
 
@@ -292,7 +293,7 @@ function createToDoList() {
 
   const header = document.createElement("h3");
 
-  parentDoc.style.backgroundColor = "#ffa362";
+  parentDoc.style.backgroundColor = colorBg;
   parentDoc.style.borderRadius = "5px";
   parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
   parentDoc.style.paddingTop = "12px";
@@ -329,7 +330,7 @@ function createToDoList() {
         const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
         due.textContent = dueDateDisplay.slice(0, -5);
 
-        card.style.backgroundColor = "#ff8f3f";
+        card.style.backgroundColor = colorBgDark;
         card.style.borderRadius = "5px";
         card.style.padding = "8px 10px";
         card.style.marginTop = "8px";
