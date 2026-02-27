@@ -128,8 +128,7 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
 document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) => {
 	const classQ = document.querySelectorAll(".class-questions");
 
-	classQ.forEach((question) => {
-		const items = document.querySelectorAll(".likert");
+	classQ.forEach((classQuestion) => {
 		items.forEach((question) => {
 			question.insertAdjacentHTML("beforeend", 
 				`
@@ -147,7 +146,7 @@ document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) =
 					`
 			);
 		});
-		question.insertAdjacentHTML("beforeend",
+		classQuestion.insertAdjacentHTML("beforeend",
 			`
 			<div class="questionnaire-nav">
 				<button id="questionnaire-prev" class="questionnaire-nav-btn"> Previous </button>
