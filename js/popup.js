@@ -126,9 +126,10 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
 });
 
 document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) => {
-	const classQ = document.querySelectorAll(".class-questions");
+	const classQ = questionnaire.querySelectorAll(".class-questions");
 
 	classQ.forEach((classQuestion) => {
+		const items = classQuestion.querySelectorAll(".likert");
 		items.forEach((question) => {
 			question.insertAdjacentHTML("beforeend", 
 				`
