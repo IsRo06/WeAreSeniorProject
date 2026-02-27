@@ -124,3 +124,34 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
 	items[0].classList.add("carousel__item--selected");
 	buttons[0].classList.add("carousel__button--selected");
 });
+
+document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) => {
+	const classQ = document.querySelectorAll(".class-questions");
+
+	classQ.forEach((question) => {
+		const items = document.querySelectorAll(".likert");
+		items.forEach((question) => {
+			question.insertAdjacentHTML("beforeend", 
+				`
+					<div class="likertLabels">
+						<p>Disagree</p>
+						<p>Agree</p>
+					</div>
+					<div class ="likertBtns">
+						<input name="1" type="radio" value="1" />
+						<input name="1" type="radio" value="2" />
+						<input name="1" type="radio" value="3" />
+						<input name="1" type="radio" value="4" />
+						<input name="1" type="radio" value="5" />
+					</div>
+					`
+			);
+		});
+		question.insertAdjacentHTML("beforeend",
+			`
+			<p> Yo ho yo ho </p>
+			`
+		);
+	});
+
+});
