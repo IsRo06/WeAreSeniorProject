@@ -347,7 +347,7 @@ function createToDoList() {
     parentDoc.appendChild(header);
 
 
-    getAssignmentsFromStorageOrFetch(getPlannerItems).then((result) => {
+    getAssignmentsFromStorageOrFetch().then((result) => {
         assignments = result;
 
         const { toDoAssignments } = organizeAssignments(assignments);
@@ -376,6 +376,8 @@ function createToDoList() {
                 card.style.display = "flex";
                 card.style.justifyContent = "space-between";
                 card.style.alignItems = "flex-start";
+                card.style.transition = "background-color 0.2s ease";
+                card.style.cursor = "pointer";
 
                 due.style.fontSize = "12px";
                 due.style.opacity = "0.9";
@@ -386,6 +388,14 @@ function createToDoList() {
 
                 card.addEventListener("click", async () => {
                     await handleAssignmentClick(a.id);
+                });
+
+                card.addEventListener("mouseenter", () => {
+                    card.style.backgroundColor = "#ff7a1f";
+                });
+
+                card.addEventListener("mouseleave", () => {
+                    card.style.backgroundColor = "#ff8f3f";
                 });
             });
     });
@@ -556,6 +566,7 @@ async function determineWhyImportant(assignment) {
         );
 
         const data = await response.json();
+
         console.log("Gemini importance response:", data);
         return data.candidates[0].content.parts[0].text;
     } catch (error) {
