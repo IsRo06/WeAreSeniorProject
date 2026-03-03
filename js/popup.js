@@ -148,37 +148,57 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
 
 document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) => {
 	const classQ = questionnaire.querySelectorAll(".class__questions");
+	let currClassInd = 0;
 
 	classQ.forEach((classQuestion) => {
 		createQuestionnaire(classQuestion);
 	});
 
+	const nextClassBtn = document.getElementById("questionnaire-next");
+	const prevClassBtn = document.getElementById("questionnaire-prev");
+	const submitBtn = document.getElementById("questionnaire-submit");
+	prevClassBtn.classList.add("disabled");
+
 	function setClass(index) {
 		classQ.forEach(item => item.classList.remove("class__questions--selected"));
 		classQ[index].classList.add("class__questions--selected");
+
 	}
 
-	const nextClassBtn = document.getElementById("questionnaire-next");
-	const prevClassBtn = document.getElementById("questionnaire-prev");
 
-	if(nextClassBtn && prevClassBtn){
+	classQ[0].classList.add("class__questions--selected");
+
+	if(nextClassBtn && prevClassBtn && submitBtn){
 		nextClassBtn.addEventListener("click", () => {
-			let index = Array.from(classQ).findIndex(item => item.classList.contains("class__questions--selected")) + 1;
-			if (index >= classQ.length) index = 0;
-			setClass(index);
+			prevClassBtn.classList.remove("disabled");
+			currClassInd += 1;
+			if(currClassInd >= classQ.length - 1){
+				nextClassBtn.style.display = "none";
+				submitBtn.style.display = "block";
+			}
+			setClass(currClassInd);
 		});
 
 		prevClassBtn.addEventListener("click", () => {
-			let index = Array.from(classQ).findIndex(item => item.classList.contains("class__questions--selected")) - 1;
-			if (index < 0) index = classQ.length - 1;
-			setClass(index);
+			currClassInd -= 1;
+			nextClassBtn.style.display = "block";
+			submitBtn.style.display = "none";
+			if(currClassInd <= 0){
+				prevClassBtn.classList.add("disabled");
+				currClassInd = 0;
+			}
+
+			setClass(currClassInd);
 		});
 	}
 
 	// Select the first item on page load
-	classQ[0].classList.add("class__questions--selected");
 
 });
+
+function submitQuestionnaire(){
+	// TODO Complete submission stuff
+}
 
 function createQuestionnaire(classDoc){
 		classDoc.insertAdjacentHTML("beforeend",
