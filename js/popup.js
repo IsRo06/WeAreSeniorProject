@@ -125,14 +125,12 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
 	if(nextBtn && prevBtn){
 		nextBtn.addEventListener("click", () => {
 			let index = Array.from(items).findIndex(item => item.classList.contains("carousel__item--selected")) + 1;
-			console.log("NEXT CLICKED");
 			if (index >= items.length) index = 0;
 			setSlide(index);
 		});
 
 		prevBtn.addEventListener("click", () => {
 			let index = Array.from(items).findIndex(item => item.classList.contains("carousel__item--selected")) - 1;
-			console.log("PREV CLICKED");
 			if (index < 0) index = items.length - 1;
 			setSlide(index);
 		});
@@ -149,10 +147,75 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
 });
 
 document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) => {
-	const classQ = questionnaire.querySelectorAll(".class-questions");
+	const classQ = questionnaire.querySelectorAll(".class__questions");
 
 	classQ.forEach((classQuestion) => {
-		const items = classQuestion.querySelectorAll(".likert");
+		createQuestionnaire(classQuestion);
+	});
+
+	function setClass(index) {
+		classQ.forEach(item => item.classList.remove("class__questions--selected"));
+		classQ[index].classList.add("class__questions--selected");
+	}
+
+	const nextClassBtn = document.getElementById("questionnaire-next");
+	const prevClassBtn = document.getElementById("questionnaire-prev");
+
+	if(nextClassBtn && prevClassBtn){
+		nextClassBtn.addEventListener("click", () => {
+			let index = Array.from(classQ).findIndex(item => item.classList.contains("class__questions--selected")) + 1;
+			if (index >= classQ.length) index = 0;
+			setClass(index);
+		});
+
+		prevClassBtn.addEventListener("click", () => {
+			let index = Array.from(classQ).findIndex(item => item.classList.contains("class__questions--selected")) - 1;
+			if (index < 0) index = classQ.length - 1;
+			setClass(index);
+		});
+	}
+
+	// Select the first item on page load
+	classQ[0].classList.add("class__questions--selected");
+
+});
+
+function createQuestionnaire(classDoc){
+		classDoc.insertAdjacentHTML("beforeend",
+			`
+						<p class="class-prompt">I am taking this class because...</P>
+						<div class="questions-wrapper">
+							<div class="likert">
+								<p class="likertQuestion">I'm interested in the subject matter</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">I like the professor</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">It's important to my career</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">It fits my schedule</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">It fits a general education requirement</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">It is required for my major</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">I think it'll be a valuable experience</p>
+							</div>
+							<label class="likertQuestion" for="additional-thoughts">Additional thoughts...</p>
+								<textarea id="additional-thoughts" name="additional-thoughts" rows="4" cols="40">More information on why you're taking this class...</textarea>
+						</div>
+			`
+		);
+		addLikertScales(classDoc);
+}
+
+function addLikertScales(classDoc){
+		const items = classDoc.querySelectorAll(".likert");
 		items.forEach((question) => {
 			question.insertAdjacentHTML("beforeend", 
 				`
@@ -170,17 +233,7 @@ document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) =
 					`
 			);
 		});
-		classQuestion.insertAdjacentHTML("beforeend",
-			`
-			<div class="questionnaire-nav">
-				<button id="questionnaire-prev" class="questionnaire-nav-btn"> Previous </button>
-				<button id="questionnaire-prev" class="questionnaire-nav-btn"> Next </button>
-			</div>
-			`
-		);
-	});
-
-});
+}
 
 
 

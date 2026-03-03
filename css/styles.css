@@ -150,7 +150,7 @@ h2 {
 }
 
 
-.class-questions{
+.class__questions{
 	margin: 2px;
 	background: #ddd;
 	border-radius: 10px 10px 5px 5px;
@@ -158,6 +158,11 @@ h2 {
 	border-width: 2px;
 	border-style: solid;
 	padding: 0;
+	display: none;
+}
+
+.class__questions--selected{
+	display: block;
 }
 
 .class-prompt{
@@ -223,7 +228,6 @@ h2 {
 	margin: 4px;
 	justify-content: space-between;
 }
-
 
 .questionnaire-nav-btn {
 	background-color: #094b80;
