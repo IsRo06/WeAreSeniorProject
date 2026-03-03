@@ -25,7 +25,8 @@ h2 {
 	margin: 0;
 }
 
-#selectBtn {
+
+.btn {
 	background-color: #094b80;
 	border-radius: 5px;
 	border-color: #094b80;
@@ -35,14 +36,48 @@ h2 {
 	margin-top: 5px;
 	width: 100%;
 	height: 40px;
-	font-size: 20px;
 }
 
-#selectBtn:hover{
+.btn:hover{
 	border-color: #094b80;
 	background-color: #FFFFFF;
 	color: #094b80;
 	cursor: pointer;
+}
+
+#selectBtn {
+	font-size: 20px;
+}
+
+#toCustomization {
+	font-size: 20px;
+}
+
+#toQuestionnaire {
+	font-size: 16px;
+}
+
+.page-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+}
+
+.screen {
+  height: 80px;
+  width: 60px;
+  padding: 1em;
+  font-family: "Quicksand", sans-serif;
+  font-weight: bold;
+  font-size: 2em;
+  text-align: center;
+  color: #ffffff;
+  display: none;
+}
+
+.screen--selected {
+  display: block;
 }
 
 .carousel-wrapper { 

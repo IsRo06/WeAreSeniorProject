@@ -14,6 +14,10 @@ const catImg = document.getElementById("catImg");
 
 const imageElement = document.getElementById("myImage");
 
+
+const toQuestionnaireBtn = document.getElementById("toQuestionnaire");
+const toCustomizationBtn = document.getElementById("toCustomization");
+
 const PATHS = {
   cat: {
     normal: "/Images/Cat/CatWagTail.gif",
@@ -178,3 +182,26 @@ document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) =
 
 });
 
+
+
+toQuestionnaireBtn.addEventListener("click", () => {
+	const customizeScreen = document.getElementById("customizeScreen");     
+	const questionnaireScreen = document.getElementById("questionnaireScreen");     
+
+	customizeScreen.classList.remove("screen--selected");
+	customizeScreen.classList.add("screen");
+	
+	questionnaireScreen.classList.add("screen--selected");
+	questionnaireScreen.classList.remove("screen");
+});
+
+toCustomizationBtn.addEventListener("click", () => {
+	const customizeScreen = document.getElementById("customizeScreen");     
+	const questionnaireScreen = document.getElementById("questionnaireScreen");     
+
+	questionnaireScreen.classList.remove("screen--selected");
+	questionnaireScreen.classList.add("screen");
+	
+	customizeScreen.classList.add("screen--selected");
+	customizeScreen.classList.remove("screen");
+});

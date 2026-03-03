@@ -1,81 +1,88 @@
 <html>
 	<link rel="stylesheet" href="../css/styles.css">
-  <body>
-    <h1>Canvas Pets</h1>
-	<div class="carousel-wrapper">
-		<button class="carousel__arrow carousel__arrow--left" id="prevBtn">&#10094;</button>
-		<div class="carousel">
+	<body>
+		<h1>Canvas Pets</h1>
+		<div class="page-wrapper">
+			<div class="screen--selected" id="customizeScreen">
+				<div class="carousel-wrapper">
+					<button class="carousel__arrow carousel__arrow--left" id="prevBtn">&#10094;</button>
+					<div class="carousel">
 
-			<div class="carousel__item" data-pet="cat">
-				<img id="catImg" src="/Images/Cat/CatWagTail.gif" />
-			</div>
-			<div class="carousel__item" data-pet="dog">
-				<img id="dogImg" src="/Images/Dog/DogTailWag.gif" />
-			</div>
+						<div class="carousel__item" data-pet="cat">
+							<img id="catImg" src="/Images/Cat/CatWagTail.gif" />
+						</div>
+						<div class="carousel__item" data-pet="dog">
+							<img id="dogImg" src="/Images/Dog/DogTailWag.gif" />
+						</div>
 
-		</div>
-		<button class="carousel__arrow carousel__arrow--right" id="nextBtn">&#10095;</button>
-	</div>
-
-	<button id="selectBtn">Select Pet</button>
-	<br/>
-
-    <label>
-      <input type="checkbox" id="moodToggle">
-      Happy
-    </label>
-
-	<br/>
-
-     <label>
-      <input type="checkbox" id="hungerToggle" />
-      Hungry
-    </label>
-
-	<br/>
-
-    <label>
-      <input type="checkbox" id="eatingToggle" />
-      Eating
-    </label>
-
-	<div>
-		<h2> Class Motivations </h2>
-		<div class="motivation-questionnaire">
-			<div class="class-questions">
-				<div class="class-header">
-					<h3> Class: [CLASS HERE] </h3>
+					</div>
+					<button class="carousel__arrow carousel__arrow--right" id="nextBtn">&#10095;</button>
 				</div>
-				<p class="class-prompt">I am taking this class because...</P>
-				<div class="questions-wrapper">
-					<div class="likert">
-						<p class="likertQuestion">I'm interested in the subject matter</p>
+
+				<button id="selectBtn" class="btn">Select Pet</button>
+				<br/>
+
+				<label>
+					<input type="checkbox" id="moodToggle">
+					Happy
+				</label>
+
+				<br/>
+
+				<label>
+					<input type="checkbox" id="hungerToggle" />
+					Hungry
+				</label>
+
+				<br/>
+
+				<label>
+					<input type="checkbox" id="eatingToggle" />
+					Eating
+				</label>
+
+				<button id="toQuestionnaire" class="btn">Motivation Questionnaire &#10095;</button>
+			</div>
+
+			<div class="screen" id="questionnaireScreen">
+				<h2> Class Motivations </h2>
+				<div class="motivation-questionnaire">
+					<div class="class-questions">
+						<div class="class-header">
+							<h3> Class: [CLASS HERE] </h3>
+						</div>
+						<p class="class-prompt">I am taking this class because...</P>
+						<div class="questions-wrapper">
+							<div class="likert">
+								<p class="likertQuestion">I'm interested in the subject matter</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">I like the professor</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">It's important to my career</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">It fits my schedule</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">It fits a general education requirement</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">It is required for my major</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">I think it'll be a valuable experience</p>
+							</div>
+							<label class="likertQuestion" for="additional-thoughts">Additional thoughts...</p>
+								<textarea id="additional-thoughts" name="additional-thoughts" rows="4" cols="40">More information on why you're taking this class...</textarea>
+						</div>
 					</div>
-					<div class="likert">
-						<p class="likertQuestion">I like the professor</p>
-					</div>
-					<div class="likert">
-						<p class="likertQuestion">It's important to my career</p>
-					</div>
-					<div class="likert">
-						<p class="likertQuestion">It fits my schedule</p>
-					</div>
-					<div class="likert">
-						<p class="likertQuestion">It fits a general education requirement</p>
-					</div>
-					<div class="likert">
-						<p class="likertQuestion">It is required for my major</p>
-					</div>
-					<div class="likert">
-						<p class="likertQuestion">I think it'll be a valuable experience</p>
-					</div>
-					<label class="likertQuestion" for="additional-thoughts">Additional thoughts...</p>
-						<textarea id="additional-thoughts" name="additional-thoughts" rows="4" cols="40">More information on why you're taking this class...</textarea>
 				</div>
+				<button id="toCustomization" class="btn">&#10094; Back </button>
+
 			</div>
 		</div>
-
-	</div>
 
     
 
