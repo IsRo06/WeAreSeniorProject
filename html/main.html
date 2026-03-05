@@ -1,28 +1,74 @@
 <html>
-  <body>
-    <h1>Canvas Pets</h1>
+	<link rel="stylesheet" href="../css/styles.css">
+	<body>
+		<h1>Canvas Pets</h1>
+		<div class="page-wrapper">
+			<div class="screen--selected" id="customizeScreen">
+				<div class="carousel-wrapper">
+					<button class="carousel__arrow carousel__arrow--left" id="prevBtn">&#10094;</button>
+					<div class="carousel">
 
-    <img id="myImage" src="/Images/Cat/CatWagTail.gif" />
+						<div class="carousel__item" data-pet="cat">
+							<img id="catImg" src="/Images/Cat/CatWagTail.gif" />
+						</div>
+						<div class="carousel__item" data-pet="dog">
+							<img id="dogImg" src="/Images/Dog/DogTailWag.gif" />
+						</div>
 
-    <label>
-      <input type="checkbox" id="animalToggle">
-      Cat / Dog
-    </label>
+					</div>
+					<button class="carousel__arrow carousel__arrow--right" id="nextBtn">&#10095;</button>
+				</div>
 
-    <label>
-      <input type="checkbox" id="moodToggle">
-      Happy
-    </label>
+				<button id="selectBtn" class="btn">Select Pet</button>
+				<br/>
 
-     <label>
-      <input type="checkbox" id="hungerToggle" />
-      Hungry
-    </label>
+				<label>
+					<input type="checkbox" id="moodToggle">
+					Happy
+				</label>
+
+				<br/>
+
+				<label>
+					<input type="checkbox" id="hungerToggle" />
+					Hungry
+				</label>
+
+				<br/>
+
+				<label>
+					<input type="checkbox" id="eatingToggle" />
+					Eating
+				</label>
+
+				<button id="toQuestionnaire" class="btn">Motivation Questionnaire &#10095;</button>
+			</div>
+
+			<div class="screen" id="questionnaireScreen">
+				<h2> Class Motivations </h2>
+				<div class="motivation-questionnaire">
+					<div class="class__questions">
+						<div class="class-header">
+							<h3> Class: Basics of Programming </h3>
+						</div>
+					</div>
+					<div class="class__questions">
+						<div class="class-header">
+							<h3> Class: Computer Organization </h3>
+						</div>
+					</div>
+					<div class="questionnaire-nav">
+						<button id="questionnaire-prev" class="questionnaire-nav-btn"> Previous </button>
+						<button id="questionnaire-next" class="questionnaire-nav-btn"> Next </button>
+						<button id="questionnaire-submit" class="questionnaire-nav-btn"> Submit </button>
+					</div>
+				</div>
+				<button id="toCustomization" class="btn">&#10094; Back </button>
+
+			</div>
+		</div>
+
     
-    <label>
-      <input type="checkbox" id="eatingToggle" />
-      Eating
-    </label>
 
     <script type="module" src="/js/popup.js"></script>
   </body>
