@@ -8,6 +8,13 @@ let pet = {
     wellbeing: "good",
 }
 
+const colorBg = "#094b80";
+const colorBgDark = "#07375F";
+const colorScene = "#6B9AC4";
+const colorBtn = colorBgDark; //"#2D0C11";
+const colorBarBg = "#ddd";
+const colorBarGreen = "#659B5E";
+
 // Storage helper to save and retrieve assignments from Chrome's local storage
 const Storage = {
     async setAssignments(assignments) {
@@ -31,16 +38,16 @@ const Storage = {
     },
 };
 
-let isDog = false;
+let animalType = "cat";
 
 console.log("Canvas Pet content.js loaded");
 
 chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.dogSelected) {
-        const newValue = changes.dogSelected.newValue;
-        isDog = newValue;
-        console.log("Is Dog: " + isDog);
-    }
+  if (area === "local" && changes.selectedPet) {
+    const newValue = changes.selectedPet.newValue;
+    animalType = newValue;
+    console.log("Animal Type: " + animalType);
+  }
 });
 
 isDomainCanvas();
@@ -321,100 +328,69 @@ function createPetImages() {
 }
 
 function createToDoList() {
-    const parentDoc = document.createElement("div");
+  const parentDoc = document.createElement("div");
 
-    const header = document.createElement("h3");
+  const header = document.createElement("h3");
 
-    parentDoc.style.backgroundColor = "#ffa362";
-    parentDoc.style.borderRadius = "5px";
-    parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
-    parentDoc.style.paddingTop = "12px";
-    parentDoc.style.paddingLeft = "12px";
-    parentDoc.style.paddingRight = "12px";
-    parentDoc.style.paddingBottom = "250px";
-    parentDoc.style.margin = "10px";
+  parentDoc.style.backgroundColor = colorBg;
+  parentDoc.style.borderRadius = "5px";
+  parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+  parentDoc.style.paddingTop = "12px";
+  parentDoc.style.paddingLeft = "12px";
+  parentDoc.style.paddingRight = "12px";
+  parentDoc.style.paddingBottom = "250px";
+  parentDoc.style.margin = "10px";
 
-    parentDoc.style.display = "flex";
-    parentDoc.style.flexDirection = "column";
-    parentDoc.style.alignItems = "center";
-    parentDoc.style.justifyContent = "flex-start";
+  parentDoc.style.display = "flex";
+  parentDoc.style.flexDirection = "column";
+  parentDoc.style.alignItems = "center";
+  parentDoc.style.justifyContent = "flex-start";
 
-    header.textContent = "Upcoming Assignments";
-    header.style.textAlign = "center";
-    header.style.margin = "0";
-    header.style.color = "white";
+  header.textContent = "Upcoming Assignments";
+  header.style.textAlign = "center";
+  header.style.margin = "0";
+  header.style.color = "white";
 
-    parentDoc.appendChild(header);
+  parentDoc.appendChild(header);
 
+  getAssignmentsFromStorageOrFetch(getPlannerItems).then((assignments) => {
+    const { toDoAssignments } = organizeAssignments(assignments);
 
-    getAssignmentsFromStorageOrFetch().then((result) => {
-        assignments = result;
+    toDoAssignments
+      .filter((a) => isWithinNext7Days(a.plannable_date))
+      .forEach((a) => {
+        const card = document.createElement("div");
+        const title = document.createElement("div");
+        const due = document.createElement("div");
 
-        const { toDoAssignments } = organizeAssignments(assignments);
+        title.textContent = a.plannable?.title || "Untitled";
 
-        toDoAssignments
-            .filter((a) => isWithinNext7Days(a.dueAt))
-            .forEach((a) => {
-                const card = document.createElement("div");
-                const title = document.createElement("div");
-                const due = document.createElement("div");
+        const dueDate = new Date(a.plannable_date);
+        const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
+        due.textContent = dueDateDisplay.slice(0, -5);
 
-                title.textContent = a.title || "Untitled";
+        card.style.backgroundColor = colorBgDark;
+        card.style.borderRadius = "5px";
+        card.style.padding = "8px 10px";
+        card.style.marginTop = "8px";
+        card.style.width = "100%";
+        card.style.color = "white";
+        card.style.boxSizing = "border-box";
 
-                const dueDate = new Date(a.dueAt);
-                const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
-                due.textContent = dueDateDisplay.slice(0, -5);
+        card.style.display = "flex";
+        card.style.justifyContent = "space-between";
+        card.style.alignItems = "flex-start";
 
-                card.style.backgroundColor = "#ff8f3f";
-                card.style.borderRadius = "5px";
-                card.style.padding = "8px 10px";
-                card.style.marginTop = "8px";
-                card.style.width = "100%";
-                card.style.color = "white";
-                card.style.boxSizing = "border-box";
+        due.style.fontSize = "12px";
+        due.style.opacity = "0.9";
 
-                card.style.display = "flex";
-                card.style.justifyContent = "space-between";
-                card.style.alignItems = "flex-start";
-                card.style.transition = "background-color 0.2s ease";
-                card.style.cursor = "pointer";
+        card.appendChild(title);
+        card.appendChild(due);
+        parentDoc.appendChild(card);
+      });
+  });
 
-                due.style.fontSize = "12px";
-                due.style.opacity = "0.9";
-
-                card.appendChild(title);
-                card.appendChild(due);
-                parentDoc.appendChild(card);
-
-                card.addEventListener("click", async () => {
-                    await handleAssignmentClick(a.id);
-                });
-
-                card.addEventListener("mouseenter", () => {
-                    card.style.backgroundColor = "#ff7a1f";
-                });
-
-                card.addEventListener("mouseleave", () => {
-                    card.style.backgroundColor = "#ff8f3f";
-                });
-            });
-    });
-
-    return parentDoc;
-}
-
-// handle click on assignment
-async function handleAssignmentClick(id) {
-    const assignment = assignments.find((a) => a.id === id);
-    const motivationMsg = document.getElementById("pet-motivation-msg");
-
-    if (!assignment.whyImportant) {
-        assignment.whyImportant = await determineWhyImportant(assignment);
-        await Storage.setAssignments(assignments);
-    }
-
-    // diplay the importance of the assignment as the pet's message
-    displayMotivation(assignment.whyImportant, motivationMsg);
+  return parentDoc;
 }
 
 function isWithinNext7Days(dueDateStr) {
@@ -432,11 +408,11 @@ function createPetStats() {
     const moodStatBar = createStatBar("Mood", 85);
     const wellbeingStatBar = createStatBar("Well-being", 40);
 
-    parentDoc.style.backgroundColor = "#ffa362";
-    parentDoc.style.borderRadius = "5px";
-    parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
-    parentDoc.style.padding = "5px";
-    parentDoc.style.margin = "10px";
+  parentDoc.style.backgroundColor = colorBg;
+  parentDoc.style.borderRadius = "5px";
+  parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+  parentDoc.style.padding = "5px";
+  parentDoc.style.margin = "10px";
 
     header.textContent = "Pet Stats";
     header.style.textAlign = "center";
@@ -451,57 +427,57 @@ function createPetStats() {
 }
 
 function createStatBar(label, percent) {
-    const statBar = document.createElement("div");
-    const statLabel = document.createElement("p");
-    const bar = document.createElement("div");
-    const barBg = document.createElement("div");
-    const barFill = document.createElement("div");
-    const percentNum = document.createElement("p");
+  const statBar = document.createElement("div");
+  const statLabel = document.createElement("p");
+  const bar = document.createElement("div");
+  const barBg = document.createElement("div");
+  const barFill = document.createElement("div");
+  const percentNum = document.createElement("p");
 
-    statBar.style.padding = "0 5px 0 5px";
+  statBar.style.padding = "0 5px 0 5px";
 
-    statLabel.textContent = label;
-    percentNum.textContent = percent + "%";
+  statLabel.textContent = label;
+  percentNum.textContent = percent + "%";
 
-    statLabel.style.textAlign = "center";
-    statLabel.style.fontWeight = "bold";
-    statLabel.style.padding = "0px";
-    statLabel.style.margin = "0px";
-    statLabel.style.color = "white";
+  statLabel.style.textAlign = "center";
+  statLabel.style.fontWeight = "bold";
+  statLabel.style.padding = "0px";
+  statLabel.style.margin = "0px";
+  statLabel.style.color = "white";
 
-    percentNum.style.color = "white";
+  percentNum.style.color = "white";
 
-    bar.style.display = "flex";
-    bar.style.width = "auto";
-    bar.style.flexDirection = "row";
-    bar.style.alignItems = "center";
-    bar.style.padding = "0px";
-    bar.style.gap = "5px";
-    bar.style.margin = "0px";
+  bar.style.display = "flex";
+  bar.style.width = "auto";
+  bar.style.flexDirection = "row";
+  bar.style.alignItems = "center";
+  bar.style.padding = "0px";
+  bar.style.gap = "5px";
+  bar.style.margin = "0px";
 
-    barBg.style.backgroundColor = "#dddddd";
-    barBg.style.height = "20px";
-    barBg.style.width = "100%";
-    barBg.style.display = "flex";
-    barBg.style.alignItems = "center";
-    barBg.style.borderRadius = "10px";
+  barBg.style.backgroundColor = colorBarBg;
+  barBg.style.height = "20px";
+  barBg.style.width = "100%";
+  barBg.style.display = "flex";
+  barBg.style.alignItems = "center";
+  barBg.style.borderRadius = "10px";
 
-    barFill.style.backgroundColor = "#4ec67f";
-    barFill.style.height = "100%";
-    barFill.style.width = percent + "%";
-    barFill.style.borderRadius = "10px";
+  barFill.style.backgroundColor = colorBarGreen;
+  barFill.style.height = "100%";
+  barFill.style.width = percent + "%";
+  barFill.style.borderRadius = "10px";
 
-    statBar.appendChild(statLabel);
-    statBar.appendChild(bar);
-    bar.appendChild(barBg);
-    barBg.appendChild(barFill);
-    bar.appendChild(percentNum);
-    return statBar;
+  statBar.appendChild(statLabel);
+  statBar.appendChild(bar);
+  bar.appendChild(barBg);
+  barBg.appendChild(barFill);
+  bar.appendChild(percentNum);
+  return statBar;
 }
 
 function updatePet(moodToggle, imageElement) {
-    const animal = isDog ? "dog" : "cat";
-    const mood = moodToggle.checked ? "happy" : "normal";
+  const animal = animalType;
+  const mood = moodToggle.checked ? "happy" : "normal";
 
     const paths = getAnimalPaths();
     console.log(paths[animal][mood]);
