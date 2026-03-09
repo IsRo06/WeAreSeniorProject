@@ -1,41 +1,41 @@
 // Everything in this file is loaded into the browser context
-//kskskkskks
 // CONSTANTS
 const domain = window.location.origin;
 let assignments = [];
-let pet = {
-    mood: "happy",
-    wellbeing: "good",
-}
 
 const colorBg = "#094b80";
 const colorBgDark = "#07375F";
 const colorScene = "#6B9AC4";
-const colorBtn = colorBgDark; //"#2D0C11";
+const colorBtn = colorBgDark;
 const colorBarBg = "#ddd";
 const colorBarGreen = "#659B5E";
 
+let pet = {
+  mood: "happy",
+  wellbeing: "good",
+};
+
 // Storage helper to save and retrieve assignments from Chrome's local storage
 const Storage = {
-    async setAssignments(assignments) {
-        await chrome.storage.local.set({
-            assignments: assignments,
-            updatedAt: Date.now(),
-        });
+  async setAssignments(assignments) {
+    await chrome.storage.local.set({
+      assignments: assignments,
+      updatedAt: Date.now(),
+    });
 
-        console.log("Assignments saved to storage");
-    },
+    console.log("Assignments saved to storage");
+  },
 
-    async getAssignments() {
-        const { assignments, updatedAt } = await chrome.storage.local.get([
-            "assignments",
-            "updatedAt",
-        ]);
+  async getAssignments() {
+    const { assignments, updatedAt } = await chrome.storage.local.get([
+      "assignments",
+      "updatedAt",
+    ]);
 
-        console.log("Retrieving assignments from storage: ", assignments);
+    console.log("Retrieving assignments from storage: ", assignments);
 
-        return { assignments, updatedAt };
-    },
+    return { assignments, updatedAt };
+  },
 };
 
 let animalType = "cat";
@@ -53,278 +53,284 @@ chrome.storage.onChanged.addListener((changes, area) => {
 isDomainCanvas();
 
 function isDomainCanvas() {
-    if (location.hostname.includes("instructure.com")) {
-        startExtension();
-    }
+  if (location.hostname.includes("instructure.com")) {
+    startExtension();
+  }
 }
 
 function hideTodo() {
-    const style = document.createElement("style");
-    style.id = "hide-canvas-todo";
-    style.textContent = `
+  const style = document.createElement("style");
+  style.id = "hide-canvas-todo";
+  style.textContent = `
     #right-side { display: none !important; }
   `;
-    document.head.appendChild(style);
+  document.head.appendChild(style);
 }
 
 function organizeAssignments(assignments) {
-    const now = new Date();
-    let toDoAssignments = [];
-    let overdueAssignments = [];
+  const now = new Date();
+  let toDoAssignments = [];
+  let overdueAssignments = [];
 
-    if (!Array.isArray(assignments)) assignments = [];
+  if (!Array.isArray(assignments)) assignments = [];
 
-    for (let assignment of assignments) {
-        let dueDate = new Date(assignment.plannable_date);
-        if (dueDate < now) {
-            console.log(assignment);
-            overdueAssignments.push(assignment);
-        } else {
-            toDoAssignments.push(assignment);
-        }
+  for (let assignment of assignments) {
+    let dueDate = new Date(assignment.plannable_date);
+    if (dueDate < now) {
+      console.log(assignment);
+      overdueAssignments.push(assignment);
+    } else {
+      toDoAssignments.push(assignment);
     }
+  }
 
-    return { toDoAssignments, overdueAssignments };
+  return { toDoAssignments, overdueAssignments };
 }
 
 // start the extension
 function startExtension() {
-    console.log("This is Canvas! Incoming Pets!");
+  console.log("This is Canvas! Incoming Pets!");
+  console.log("Page title: ", document.title);
 
-    console.log("Page title: ", document.title);
+  hideTodo();
 
-    hideTodo();
+  chrome.storage.local.get(["pet"], (result) => {
+    if (result.pet) {
+      pet = result.pet;
 
-    chrome.storage.local.get(["pet"], (result) => {
-        if (result.pet) {
-            pet = result.pet;
+      const moodToggle = document.getElementById("moodToggle");
+      moodToggle.checked = pet.mood === "happy";
 
-            const moodToggle = document.getElementById("moodToggle");
-            moodToggle.checked = pet.mood === "happy";
+      updatePet(moodToggle, document.getElementById("petImg"));
+    }
+  });
 
-            updatePet(moodToggle, document.getElementById("petImg"));
-        }
-    });
-
-    // Get assignments from storage or fetch from API if not available or outdated
-    getAssignmentsFromStorageOrFetch().then((result) => {
-        assignments = result;
-        console.log("Assignments ready for use: ", assignments);
-    });
+  // Get assignments from storage or fetch from API if not available or outdated
+  getAssignmentsFromStorageOrFetch(getPlannerItems).then((result) => {
+    assignments = result;
+    console.log("Assignments ready for use: ", assignments);
+  });
 }
 
 async function getPlannerItems() {
-    // API endpoint to get planner items for a specific date range
-    // filtering for incomplete items
-    // limiting to 100 results per page
-    const url =
-        domain +
-        "/api/v1/planner/items" +
-        "?start_date=2026-02-04" +
-        "&end_date=2026-03-16" +
-        "&filter=incomplete_items" +
-        "&per_page=100";
+  // API endpoint to get planner items for a specific date range
+  // filtering for incomplete items
+  // limiting to 100 results per page
+  const today = new Date().toISOString().split("T")[0];
+  const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
 
-    try {
-        let response = await fetch(url);
+  const url =
+    domain +
+    "/api/v1/planner/items" +
+    `?start_date=${today}` +
+    `&end_date=${future}` +
+    "&filter=incomplete_items" +
+    "&per_page=100";
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok: " + response.statusText);
-        }
+  try {
+    let response = await fetch(url);
 
-        const data = await response.json();
-
-        // Filter for assignments only
-        rawAssignments = data.filter((item) => item.plannable_type === "assignment");
-
-        // Normalize the assignment data
-        assignments = await Promise.all(rawAssignments.map(normalizeAssignment)
-        );
-
-        console.log("Fetched and normalized assignments: ", assignments);
-
-        return assignments;
-
-    } catch (error) {
-        console.error("Error fetching planner items:", error);
+    if (!response.ok) {
+      throw new Error("Network response was not ok: " + response.statusText);
     }
+
+    const data = await response.json();
+
+    // Filter for assignments only
+    const rawAssignments = data.filter(
+      (item) => item.plannable_type === "assignment"
+    );
+
+    // Normalize the assignment data
+    assignments = await Promise.all(rawAssignments.map(normalizeAssignment));
+
+    console.log("Fetched and normalized assignments: ", assignments);
+
+    return assignments;
+  } catch (error) {
+    console.error("Error fetching planner items:", error);
+  }
 }
 
 // Normalize assignments
 async function normalizeAssignment(item) {
-    return {
-        id: item.plannable_id,
-        title: item.plannable?.title || "Untitled",
-        dueAt: item.plannable?.due_at || null,
-        course: item.context_name || "No Course",
-        whyImportant: null, // only generate if the user clicks on the assignment, to save API calls
-        completed: false
-    };
+  return {
+    id: item.plannable_id,
+    title: item.plannable?.title || "Untitled",
+    dueAt: item.plannable?.due_at || null,
+    course: item.context_name || "No Course",
+    whyImportant: null, // only generate if the user clicks on the assignment, to save API calls
+    completed: false,
+  };
 }
 
 // get assignments from storage or fetch from API if not available or outdated
 async function getAssignmentsFromStorageOrFetch(
-    fetchAgainTimer = 10 * 60 * 1000
+  getPlannerItems,
+  fetchAgainTimer = 10 * 60 * 1000
 ) {
-    const { assignments: storedAssignments, updatedAt } =
-        await Storage.getAssignments();
+  const { assignments: storedAssignments, updatedAt } =
+    await Storage.getAssignments();
 
-    // check if we need to fetch new assignments based on the last updated time and the defined timer
-    if (
-        storedAssignments &&
-        updatedAt &&
-        Date.now() - updatedAt < fetchAgainTimer
-    ) {
-        console.log("Using cached assignments from storage");
-        assignments = storedAssignments;
-    } else {
-        console.log("No valid cached assignments found, fetching from API");
-        await getPlannerItems();
-        await Storage.setAssignments(assignments);
-    }
+  // check if we need to fetch new assignments based on the last updated time and the defined timer
+  if (
+    storedAssignments &&
+    updatedAt &&
+    Date.now() - updatedAt < fetchAgainTimer
+  ) {
+    console.log("Using cached assignments from storage");
+    assignments = storedAssignments;
+  } else {
+    console.log("No valid cached assignments found, fetching from API");
+    await getPlannerItems();
+    await Storage.setAssignments(assignments);
+  }
 
-    return assignments;
+  return assignments;
 }
 
 function getAnimalPaths() {
-    const catNormalPath = chrome.runtime.getURL("/Images/Cat/CatWagTail.gif");
-    const catHappyPath = chrome.runtime.getURL("/Images/Cat/CatHappy.gif");
-    const dogNormalPath = chrome.runtime.getURL("/Images/Dog/DogTailWag.gif");
-    const dogHappyPath = chrome.runtime.getURL("/Images/Dog/Happy Dog.gif");
+  const catNormalPath = chrome.runtime.getURL("/Images/Cat/CatWagTail.gif");
+  const catHappyPath = chrome.runtime.getURL("/Images/Cat/CatHappy.gif");
+  const dogNormalPath = chrome.runtime.getURL("/Images/Dog/DogTailWag.gif");
+  const dogHappyPath = chrome.runtime.getURL("/Images/Dog/Happy Dog.gif");
 
-    return {
-        cat: {
-            normal: catNormalPath,
-            happy: catHappyPath,
-        },
-        dog: {
-            normal: dogNormalPath,
-            happy: dogHappyPath,
-        },
-    };
+  return {
+    cat: {
+      normal: catNormalPath,
+      happy: catHappyPath,
+    },
+    dog: {
+      normal: dogNormalPath,
+      happy: dogHappyPath,
+    },
+  };
 }
 
 function renderCanvasPets(element) {
-    if (!element) {
-        return;
-    }
+  if (!element) {
+    return;
+  }
 
-    const canvasPets = document.createElement("div");
-    const title = document.createElement("h2");
+  const canvasPets = document.createElement("div");
+  const title = document.createElement("h2");
 
-    const petImages = createPetImages();
-    const petStats = createPetStats();
-    const toDoList = createToDoList();
+  const petImages = createPetImages();
+  const petStats = createPetStats();
+  const toDoList = createToDoList();
 
-    title.textContent = "Welcome to Canvas Pets!";
-    title.style.textAlign = "center";
+  title.textContent = "Welcome to Canvas Pets!";
+  title.style.textAlign = "center";
 
-    canvasPets.appendChild(title);
-    canvasPets.appendChild(petImages);
-    canvasPets.appendChild(petStats);
-    canvasPets.appendChild(toDoList);
+  canvasPets.appendChild(title);
+  canvasPets.appendChild(petImages);
+  canvasPets.appendChild(petStats);
+  canvasPets.appendChild(toDoList);
 
-    element.insertAdjacentElement("beforebegin", canvasPets);
+  element.insertAdjacentElement("beforebegin", canvasPets);
 }
 
 function createPetImages() {
-    const parentDoc = document.createElement("div");
+  const parentDoc = document.createElement("div");
 
-    const petScene = document.createElement("div");
+  const petScene = document.createElement("div");
 
-    const motivationMsg = document.createElement("p");
-    const petImg = document.createElement("img");
+  const motivationMsg = document.createElement("p");
+  const petImg = document.createElement("img");
 
-    const petRefreshBtn = document.createElement("button");
-    const petMotivateBtn = document.createElement("button");
-    const spacer = document.createElement("br");
+  const petRefreshBtn = document.createElement("button");
+  const petMotivateBtn = document.createElement("button");
+  const spacer = document.createElement("br");
 
-    const moodToggleLabel = document.createElement("label");
-    const moodToggleCheck = document.createElement("input");
+  const moodToggleLabel = document.createElement("label");
+  const moodToggleCheck = document.createElement("input");
 
-    motivationMsg.textContent = "I am motivating!";
-    motivationMsg.id = "pet-motivation-msg";
+  motivationMsg.textContent = "I am motivating!";
+  motivationMsg.id = "pet-motivation-msg";
 
-    parentDoc.style.backgroundColor = "#ffa362";
-    parentDoc.style.borderRadius = "5px";
-    parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
-    parentDoc.style.padding = "5px";
-    parentDoc.style.margin = "10px";
+  parentDoc.style.backgroundColor = colorBg;
+  parentDoc.style.borderRadius = "5px";
+  parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+  parentDoc.style.padding = "5px";
+  parentDoc.style.margin = "10px";
 
-    petScene.style.backgroundColor = "#FFF585";
-    petScene.style.padding = "10px";
-    petScene.style.borderRadius = "5px";
+  petScene.style.backgroundColor = colorScene;
+  petScene.style.padding = "10px";
+  petScene.style.borderRadius = "5px";
 
-    motivationMsg.style.backgroundColor = "white";
-    motivationMsg.style.borderRadius = "8px";
-    motivationMsg.style.padding = "8px";
-    motivationMsg.style.margin = "8px auto";
-    motivationMsg.style.maxWidth = "260px";
-    motivationMsg.style.maxHeight = "120px";
-    motivationMsg.style.overflowY = "auto";
-    motivationMsg.style.lineHeight = "1.4";
-    motivationMsg.style.fontSize = "13px";
-    motivationMsg.style.boxSizing = "border-box";
+  motivationMsg.style.backgroundColor = "white";
+  motivationMsg.style.borderRadius = "8px";
+  motivationMsg.style.padding = "8px";
+  motivationMsg.style.margin = "8px auto";
+  motivationMsg.style.maxWidth = "260px";
+  motivationMsg.style.maxHeight = "120px";
+  motivationMsg.style.overflowY = "auto";
+  motivationMsg.style.lineHeight = "1.4";
+  motivationMsg.style.fontSize = "13px";
+  motivationMsg.style.boxSizing = "border-box";
 
-    const animalPaths = getAnimalPaths();
-    petImg.alt = "Image of cat wagging tail";
-    petImg.id = "petImg";
+  const animalPaths = getAnimalPaths();
+  petImg.alt = "Image of cat wagging tail";
+  petImg.id = "petImg";
 
-    petRefreshBtn.style.backgroundColor = "#FFF585";
-    petRefreshBtn.style.border = "none";
-    petRefreshBtn.style.borderRadius = "5px";
-    petRefreshBtn.style.color = "#000";
-    petRefreshBtn.style.padding = "10px";
-    petRefreshBtn.style.textAlign = "center";
-    petRefreshBtn.style.cursor = "pointer";
-    petRefreshBtn.style.marginLeft = "auto";
-    petRefreshBtn.style.marginRight = "auto";
-    petRefreshBtn.style.marginTop = "4px";
-    petRefreshBtn.textContent = "Refresh Pet!";
+  petRefreshBtn.style.backgroundColor = colorBtn;
+  petRefreshBtn.style.border = "none";
+  petRefreshBtn.style.borderRadius = "5px";
+  petRefreshBtn.style.color = "white";
+  petRefreshBtn.style.padding = "10px";
+  petRefreshBtn.style.textAlign = "center";
+  petRefreshBtn.style.cursor = "pointer";
+  petRefreshBtn.style.marginLeft = "auto";
+  petRefreshBtn.style.marginRight = "auto";
+  petRefreshBtn.style.marginTop = "4px";
+  petRefreshBtn.textContent = "Refresh Pet!";
 
-    petMotivateBtn.style.backgroundColor = "#FFF585";
-    petMotivateBtn.style.border = "none";
-    petMotivateBtn.style.borderRadius = "5px";
-    petMotivateBtn.style.color = "#000";
-    petMotivateBtn.style.padding = "10px";
-    petMotivateBtn.style.textAlign = "center";
-    petMotivateBtn.style.cursor = "pointer";
-    petMotivateBtn.style.marginLeft = "auto";
-    petMotivateBtn.style.marginRight = "auto";
-    petMotivateBtn.style.marginTop = "4px";
-    petMotivateBtn.textContent = "Get Motivation!";
+  petMotivateBtn.style.backgroundColor = colorBtn;
+  petMotivateBtn.style.border = "none";
+  petMotivateBtn.style.borderRadius = "5px";
+  petMotivateBtn.style.color = "white";
+  petMotivateBtn.style.padding = "10px";
+  petMotivateBtn.style.textAlign = "center";
+  petMotivateBtn.style.cursor = "pointer";
+  petMotivateBtn.style.marginLeft = "auto";
+  petMotivateBtn.style.marginRight = "auto";
+  petMotivateBtn.style.marginTop = "4px";
+  petMotivateBtn.textContent = "Get Motivation!";
 
-    moodToggleLabel.for = "moodToggle";
-    moodToggleLabel.textContent = "Happy";
-    moodToggleCheck.type = "checkbox";
-    moodToggleCheck.id = "moodToggle";
+  moodToggleLabel.for = "moodToggle";
+  moodToggleLabel.textContent = "Happy";
+  moodToggleLabel.style.color = "white";
+  moodToggleCheck.type = "checkbox";
+  moodToggleCheck.id = "moodToggle";
+  updatePet(moodToggleCheck, petImg);
+
+  moodToggleCheck.addEventListener("change", async () => {
     updatePet(moodToggleCheck, petImg);
 
-    moodToggleCheck.addEventListener("change", async () => {
-        updatePet(moodToggleCheck, petImg);
+    pet.mood = moodToggleCheck.checked ? "happy" : "neutral";
+    await chrome.storage.local.set({ petMood: pet.mood });
+  });
 
-        pet.mood = moodToggleCheck.checked ? "happy" : "neutral";
-        await chrome.storage.local.set({ petMood: pet.mood });
-    });
+  petRefreshBtn.addEventListener("click", () => {
+    updatePet(moodToggleCheck, petImg);
+  });
 
-    petRefreshBtn.addEventListener("click", () => {
-        updatePet(moodToggleCheck, petImg);
-    });
+  petMotivateBtn.addEventListener("click", () => {
+    PromptLLM(motivationMsg);
+  });
 
-    petMotivateBtn.addEventListener("click", () => {
-        PromptLLM(motivationMsg);
-    });
+  parentDoc.appendChild(petScene);
+  petScene.appendChild(motivationMsg);
+  petScene.appendChild(petImg);
+  parentDoc.appendChild(petRefreshBtn);
+  parentDoc.appendChild(petMotivateBtn);
+  parentDoc.appendChild(spacer);
+  parentDoc.appendChild(moodToggleCheck);
+  parentDoc.appendChild(moodToggleLabel);
 
-    parentDoc.appendChild(petScene);
-    petScene.appendChild(motivationMsg);
-    petScene.appendChild(petImg);
-    parentDoc.appendChild(petRefreshBtn);
-    parentDoc.appendChild(petMotivateBtn);
-    parentDoc.appendChild(spacer);
-    parentDoc.appendChild(moodToggleCheck);
-    parentDoc.appendChild(moodToggleLabel);
-
-    return parentDoc;
+  return parentDoc;
 }
 
 function createToDoList() {
@@ -338,7 +344,7 @@ function createToDoList() {
   parentDoc.style.paddingTop = "12px";
   parentDoc.style.paddingLeft = "12px";
   parentDoc.style.paddingRight = "12px";
-  parentDoc.style.paddingBottom = "250px";
+  parentDoc.style.paddingBottom = "200px";
   parentDoc.style.margin = "10px";
 
   parentDoc.style.display = "flex";
@@ -353,19 +359,21 @@ function createToDoList() {
 
   parentDoc.appendChild(header);
 
-  getAssignmentsFromStorageOrFetch(getPlannerItems).then((assignments) => {
+  getAssignmentsFromStorageOrFetch(getPlannerItems).then((result) => {
+    assignments = result;
+
     const { toDoAssignments } = organizeAssignments(assignments);
 
     toDoAssignments
-      .filter((a) => isWithinNext7Days(a.plannable_date))
+      .filter((a) => isWithinNext7Days(a.dueAt))
       .forEach((a) => {
         const card = document.createElement("div");
         const title = document.createElement("div");
         const due = document.createElement("div");
 
-        title.textContent = a.plannable?.title || "Untitled";
+        title.textContent = a.title || "Untitled";
 
-        const dueDate = new Date(a.plannable_date);
+        const dueDate = new Date(a.dueAt);
         const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
         due.textContent = dueDateDisplay.slice(0, -5);
 
@@ -380,6 +388,7 @@ function createToDoList() {
         card.style.display = "flex";
         card.style.justifyContent = "space-between";
         card.style.alignItems = "flex-start";
+        card.style.cursor = "pointer";
 
         due.style.fontSize = "12px";
         due.style.opacity = "0.9";
@@ -387,26 +396,44 @@ function createToDoList() {
         card.appendChild(title);
         card.appendChild(due);
         parentDoc.appendChild(card);
+
+        card.addEventListener("click", async () => {
+          await handleAssignmentClick(a.id);
+        });
       });
   });
 
   return parentDoc;
 }
 
-function isWithinNext7Days(dueDateStr) {
-    const now = new Date();
-    const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    const due = new Date(dueDateStr);
+// handle click on assignment
+async function handleAssignmentClick(id) {
+  const assignment = assignments.find((a) => a.id === id);
+  const motivationMsg = document.getElementById("pet-motivation-msg");
 
-    return due >= now && due <= weekFromNow;
+  if (!assignment.whyImportant) {
+    assignment.whyImportant = await determineWhyImportant(assignment);
+    await Storage.setAssignments(assignments);
+  }
+
+  // diplay the importance of the assignment as the pet's message
+  displayMotivation(assignment.whyImportant, motivationMsg);
+}
+
+function isWithinNext7Days(dueDateStr) {
+  const now = new Date();
+  const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const due = new Date(dueDateStr);
+
+  return due >= now && due <= weekFromNow;
 }
 
 function createPetStats() {
-    const parentDoc = document.createElement("div");
+  const parentDoc = document.createElement("div");
 
-    const header = document.createElement("h3");
-    const moodStatBar = createStatBar("Mood", 85);
-    const wellbeingStatBar = createStatBar("Well-being", 40);
+  const header = document.createElement("h3");
+  const moodStatBar = createStatBar("Mood", 85);
+  const wellbeingStatBar = createStatBar("Well-being", 40);
 
   parentDoc.style.backgroundColor = colorBg;
   parentDoc.style.borderRadius = "5px";
@@ -414,16 +441,16 @@ function createPetStats() {
   parentDoc.style.padding = "5px";
   parentDoc.style.margin = "10px";
 
-    header.textContent = "Pet Stats";
-    header.style.textAlign = "center";
-    header.style.padding = "0px";
-    header.style.color = "white";
+  header.textContent = "Pet Stats";
+  header.style.textAlign = "center";
+  header.style.padding = "0px";
+  header.style.color = "white";
 
-    parentDoc.appendChild(header);
-    parentDoc.appendChild(moodStatBar);
-    parentDoc.appendChild(wellbeingStatBar);
+  parentDoc.appendChild(header);
+  parentDoc.appendChild(moodStatBar);
+  parentDoc.appendChild(wellbeingStatBar);
 
-    return parentDoc;
+  return parentDoc;
 }
 
 function createStatBar(label, percent) {
@@ -479,87 +506,87 @@ function updatePet(moodToggle, imageElement) {
   const animal = animalType;
   const mood = moodToggle.checked ? "happy" : "normal";
 
-    const paths = getAnimalPaths();
-    console.log(paths[animal][mood]);
-    imageElement.src = paths[animal][mood];
+  const paths = getAnimalPaths();
+  console.log(paths[animal][mood]);
+  imageElement.src = paths[animal][mood];
 }
 
 //LLM stuff
 async function GetMotivation() {
-    try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
             {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
+              parts: [
+                {
+                  text: "You are an encouraging virtual pet. Give a short 1-2 sentence motivational message to a student who is behind on their assignments. Be friendly and upbeat!",
                 },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [
-                                {
-                                    text: "You are an encouraging virtual pet. Give a short 1-2 sentence motivational message to a student who is behind on their assignments. Be friendly and upbeat!",
-                                },
-                            ],
-                        },
-                    ],
-                }),
-            }
-        );
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
-        const data = await response.json();
-        console.log("Gemini response:", data);
-        return data.candidates[0].content.parts[0].text;
-    } catch (error) {
-        console.error("LLM Error:", error);
-        return "You got this!";
-    }
+    const data = await response.json();
+    console.log("Gemini response:", data);
+    return data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error("LLM Error:", error);
+    return "You got this!";
+  }
 }
 
 // Helper to display why an assignment is important based on its details (e.g. due date, course, etc.)
 async function determineWhyImportant(assignment) {
-    try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
             {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
+              parts: [
+                {
+                  text: `Given the following assignment details, explain in 1-2 sentences why this assignment might be important for a student to complete:\n\nTitle: ${assignment.title}\nCourse: ${assignment.course}\nDue Date: ${assignment.dueAt}`,
                 },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [
-                                {
-                                    text: `Given the following assignment details, explain in 1-2 sentences why this assignment might be important for a student to complete:\n\nTitle: ${assignment.title}\nCourse: ${assignment.course}\nDue Date: ${assignment.dueAt}`,
-                                },
-                            ],
-                        },
-                    ],
-                }),
-            }
-        );
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
-        const data = await response.json();
+    const data = await response.json();
 
-        console.log("Gemini importance response:", data);
-        return data.candidates[0].content.parts[0].text;
-    } catch (error) {
-        console.error("LLM Error:", error);
-        return "This assignment is important for your learning and success in the course!";
-    }
+    console.log("Gemini importance response:", data);
+    return data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error("LLM Error:", error);
+    return "This assignment is important for your learning and success in the course!";
+  }
 }
 
 function displayMotivation(message, msgElement) {
-    if (msgElement) {
-        msgElement.textContent = message;
-    }
+  if (msgElement) {
+    msgElement.textContent = message;
+  }
 }
 
 async function PromptLLM(msgElement) {
-    const motivationalMessage = await GetMotivation();
-    displayMotivation(motivationalMessage, msgElement);
+  const motivationalMessage = await GetMotivation();
+  displayMotivation(motivationalMessage, msgElement);
 }
 
 renderCanvasPets(document.querySelector("aside"));
