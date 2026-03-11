@@ -1,4 +1,4 @@
-body{ 
+body {
 	width: 270px;
 
 }
@@ -16,12 +16,12 @@ h2 {
 	padding-bottom: 0px;
 }
 
-p { 
+p {
 	margin: 0px;
 	margin-bottom: 4px;
 }
 
-.class-header{
+.class-header {
 	width: 100%;
 	padding: 10px 0;
 	margin: 0 0 5px 0;
@@ -31,7 +31,7 @@ p {
 
 }
 
-.class-header h3{
+.class-header h3 {
 	text-align: center;
 	color: white;
 	font-size: 16px;
@@ -52,7 +52,7 @@ p {
 	height: 40px;
 }
 
-.btn:hover{
+.btn:hover {
 	border-color: #094b80;
 	background-color: #FFFFFF;
 	color: #094b80;
@@ -79,22 +79,22 @@ p {
 }
 
 .screen {
-  height: 80px;
-  width: 60px;
-  padding: 1em;
-  font-family: "Quicksand", sans-serif;
-  font-weight: bold;
-  font-size: 2em;
-  text-align: center;
-  color: #ffffff;
-  display: none;
+	height: 80px;
+	width: 60px;
+	padding: 1em;
+	font-family: "Quicksand", sans-serif;
+	font-weight: bold;
+	font-size: 2em;
+	text-align: center;
+	color: #ffffff;
+	display: none;
 }
 
 .screen--selected {
-  display: block;
+	display: block;
 }
 
-.carousel-wrapper { 
+.carousel-wrapper {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -106,17 +106,17 @@ p {
 }
 
 .carousel {
-  position: relative;
+	position: relative;
 }
 
-.carousel__arrow { 
-    border: none;
+.carousel__arrow {
+	border: none;
 	background: none;
 	color: rgba(255, 255, 255, 0.5);
-    cursor: pointer;
-    font-size: 40px;
-    transition: background 0.3s;
-    z-index: 10;
+	cursor: pointer;
+	font-size: 40px;
+	transition: background 0.3s;
+	z-index: 10;
 }
 
 .carousel__arrow:hover {
@@ -125,50 +125,50 @@ p {
 
 
 .carousel__item {
-  height: 80px;
-  width: 60px;
-  padding: 1em;
-  font-family: "Quicksand", sans-serif;
-  font-weight: bold;
-  font-size: 2em;
-  text-align: center;
-  color: #ffffff;
-  display: none;
+	height: 80px;
+	width: 60px;
+	padding: 1em;
+	font-family: "Quicksand", sans-serif;
+	font-weight: bold;
+	font-size: 2em;
+	text-align: center;
+	color: #ffffff;
+	display: none;
 }
 
 .carousel__item--selected {
-  display: block;
+	display: block;
 }
 
 .carousel__nav {
-  width: 100%;
-  padding: 20px 0;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  text-align: center;
+	width: 100%;
+	padding: 20px 0;
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	text-align: center;
 }
 
 .carousel__button {
-  width: 6px;
-  height: 6px;
-  display: inline-block;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  margin: 0 5px;
-  cursor: pointer;
+	width: 6px;
+	height: 6px;
+	display: inline-block;
+	background: rgba(255, 255, 255, 0.2);
+	border-radius: 50%;
+	margin: 0 5px;
+	cursor: pointer;
 }
 
 .carousel__button--selected {
-  background: rgba(255, 255, 255, 0.5);
+	background: rgba(255, 255, 255, 0.5);
 }
 
-.motivation-questionnaire { 
+.motivation-questionnaire {
 	margin: 2px;
 }
 
 
-.class__questions{
+.class__questions {
 	background: #ddd;
 	border-radius: 10px 10px 5px 5px;
 	border-color: #094b80;
@@ -178,41 +178,41 @@ p {
 	display: none;
 }
 
-.class__questions--selected{
+.class__questions--selected {
 	display: block;
 }
 
-.class-prompt{
+.class-prompt {
 	font-size: 14px;
 	font-weight: bold;
 	padding: 0;
-	margin: 0 2px; 
+	margin: 0 2px;
 }
 
-.class-prompt p{
-	padding 0;
+.class-prompt p {
+	padding: 0;
 	margin: 0;
 }
 
-.questions-wrapper{
+.questions-wrapper {
 	margin: 0 3px;
 }
 
-.likert{
+.likert {
 	display: flex;
 	flex-direction: column;
 	gap: 0;
 	margin: 5px 1px;
 }
 
-.likertQuestion{
+.likertQuestion {
 	padding: 0;
 	margin: 0;
 	font-weight: bold;
 	font-size: 12px;
 }
 
-.likertLabels{
+.likertLabels {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -221,19 +221,19 @@ p {
 	font-weight: normal;
 }
 
-.likertLabels p{
+.likertLabels p {
 	padding: 0;
 	margin: 0;
 }
 
-.likertBtns{
+.likertBtns {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	margin: 0;
 }
 
-.likertBtns input{
+.likertBtns input {
 	border-radius: 50%;
 	background: black;
 	border-color: blue;
@@ -259,7 +259,7 @@ p {
 	font-size: 14px;
 }
 
-.questionnaire-nav-btn:hover{
+.questionnaire-nav-btn:hover {
 	border-color: #094b80;
 	background-color: white;
 	color: #094b80;
@@ -272,13 +272,13 @@ p {
 
 }
 
-#questionnaire-submit { 
+#questionnaire-submit {
 	display: none;
 	background-color: #659B5E;
 	border-color: #659B5E;
 }
 
-#questionnaire-submit:hover { 
+#questionnaire-submit:hover {
 	background-color: white;
 	color: #659B5E;
 	border-color: #659B5E;
