@@ -8,11 +8,28 @@
 					<button class="carousel__arrow carousel__arrow--left" id="prevBtn">&#10094;</button>
 					<div class="carousel">
 
-						<div class="carousel__item" data-pet="cat">
+						<div class="carousel__item" data-pet="cat1">
 							<img id="catImg" src="/Images/Cat/CatWagTail.gif" />
 						</div>
-						<div class="carousel__item" data-pet="dog">
+
+						<div class="carousel__item" data-pet="cat2">
+							<img src="/Images/Cat/Cat2Wag.gif" />
+						</div>
+
+						<div class="carousel__item" data-pet="cat3">
+							<img src="/Images/Cat/Cat3Wag.gif" />
+						</div>
+
+						<div class="carousel__item" data-pet="dog1">
 							<img id="dogImg" src="/Images/Dog/DogTailWag.gif" />
+						</div>
+
+						<div class="carousel__item" data-pet="dog2">
+							<img src="/Images/Dog/Dog2Wag.gif" />
+						</div>
+
+						<div class="carousel__item" data-pet="dog3">
+							<img src="/Images/Dog/Dog3Wag.gif" />
 						</div>
 
 					</div>
@@ -22,24 +39,27 @@
 				<button id="selectBtn" class="btn">Select Pet</button>
 				<br/>
 
-				<label>
-					<input type="checkbox" id="moodToggle">
-					Happy
-				</label>
+				<!-- Testing: Turn on -> "display: block;"    Turn Off -> "display: none;"-->
+        <div id="testingControls" style="display: none;">
+          <label>
+            <input type="checkbox" id="moodToggle">
+            Happy
+          </label>
 
-				<br/>
+          <br/>
 
-				<label>
-					<input type="checkbox" id="hungerToggle" />
-					Hungry
-				</label>
+          <label>
+            <input type="checkbox" id="hungerToggle" />
+            Hungry
+          </label>
 
-				<br/>
+          <br/>
 
-				<label>
-					<input type="checkbox" id="eatingToggle" />
-					Eating
-				</label>
+          <label>
+            <input type="checkbox" id="eatingToggle" />
+            Eating
+          </label>
+        </div>
 
 				<button id="toQuestionnaire" class="btn">Motivation Setup &#10095;</button>
 			</div>

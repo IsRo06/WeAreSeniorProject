@@ -38,7 +38,7 @@ const Storage = {
   },
 };
 
-let animalType = "cat";
+let animalType = "cat1";
 
 console.log("Canvas Pet content.js loaded");
 
@@ -47,6 +47,13 @@ chrome.storage.onChanged.addListener((changes, area) => {
     const newValue = changes.selectedPet.newValue;
     animalType = newValue;
     console.log("Animal Type: " + animalType);
+
+    const petImg = document.getElementById("petImg");
+    const moodToggle = document.getElementById("moodToggle");
+
+    if (petImg && moodToggle) {
+      updatePet(moodToggle, petImg);
+    }
   }
 });
 
@@ -94,14 +101,16 @@ function startExtension() {
 
   hideTodo();
 
+  chrome.storage.local.get(["selectedPet"], (result) => {
+    if (result.selectedPet) {
+      animalType = result.selectedPet;
+      console.log("Loaded selected pet:", animalType);
+    }
+  });
+
   chrome.storage.local.get(["pet"], (result) => {
     if (result.pet) {
       pet = result.pet;
-
-      const moodToggle = document.getElementById("moodToggle");
-      moodToggle.checked = pet.mood === "happy";
-
-      updatePet(moodToggle, document.getElementById("petImg"));
     }
   });
 
@@ -192,19 +201,42 @@ async function getAssignmentsFromStorageOrFetch(
 }
 
 function getAnimalPaths() {
-  const catNormalPath = chrome.runtime.getURL("/Images/Cat/CatWagTail.gif");
-  const catHappyPath = chrome.runtime.getURL("/Images/Cat/CatHappy.gif");
-  const dogNormalPath = chrome.runtime.getURL("/Images/Dog/DogTailWag.gif");
-  const dogHappyPath = chrome.runtime.getURL("/Images/Dog/Happy Dog.gif");
-
   return {
-    cat: {
-      normal: catNormalPath,
-      happy: catHappyPath,
+    cat1: {
+      normal: chrome.runtime.getURL("/Images/Cat/CatWagTail.gif"),
+      happy: chrome.runtime.getURL("/Images/Cat/CatHappy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Cat/CatHungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Cat/CatEating.gif"),
     },
-    dog: {
-      normal: dogNormalPath,
-      happy: dogHappyPath,
+    cat2: {
+      normal: chrome.runtime.getURL("/Images/Cat/Cat2Wag.gif"),
+      happy: chrome.runtime.getURL("/Images/Cat/Cat2Happy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Cat/Cat2Hungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Cat/Cat2Eating.gif"),
+    },
+    cat3: {
+      normal: chrome.runtime.getURL("/Images/Cat/Cat3Wag.gif"),
+      happy: chrome.runtime.getURL("/Images/Cat/Cat3Happy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Cat/Cat3Hungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Cat/Cat3Eating.gif"),
+    },
+    dog1: {
+      normal: chrome.runtime.getURL("/Images/Dog/DogTailWag.gif"),
+      happy: chrome.runtime.getURL("/Images/Dog/Happy Dog.gif"),
+      hungry: chrome.runtime.getURL("/Images/Dog/DogHungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Dog/DogEating.gif"),
+    },
+    dog2: {
+      normal: chrome.runtime.getURL("/Images/Dog/Dog2Wag.gif"),
+      happy: chrome.runtime.getURL("/Images/Dog/Dog2Happy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Dog/Dog2Hungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Dog/Dog2Eating.gif"),
+    },
+    dog3: {
+      normal: chrome.runtime.getURL("/Images/Dog/Dog3Wag.gif"),
+      happy: chrome.runtime.getURL("/Images/Dog/Dog3Happy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Dog/Dog3Hungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Dog/Dog3Eating.gif"),
     },
   };
 }
@@ -327,8 +359,8 @@ function createPetImages() {
   parentDoc.appendChild(petRefreshBtn);
   parentDoc.appendChild(petMotivateBtn);
   parentDoc.appendChild(spacer);
-  parentDoc.appendChild(moodToggleCheck);
-  parentDoc.appendChild(moodToggleLabel);
+  //parentDoc.appendChild(moodToggleCheck);
+  //parentDoc.appendChild(moodToggleLabel);
 
   return parentDoc;
 }
@@ -503,11 +535,17 @@ function createStatBar(label, percent) {
 }
 
 function updatePet(moodToggle, imageElement) {
-  const animal = animalType;
+  const animal = animalType || "cat1";
   const mood = moodToggle.checked ? "happy" : "normal";
 
   const paths = getAnimalPaths();
-  console.log(paths[animal][mood]);
+
+  if (!paths[animal] || !paths[animal][mood]) {
+    console.log("Missing pet path for:", animal, mood);
+    return;
+  }
+
+  console.log("Updating pet to:", animal, mood, paths[animal][mood]);
   imageElement.src = paths[animal][mood];
 }
 
