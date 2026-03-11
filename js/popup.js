@@ -151,7 +151,7 @@ document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) =
 	let currClassInd = 0;
 
 	classQ.forEach((classQuestion) => {
-		createQuestionnaire(classQuestion);
+		addLikertScales(classQuestion);
 	});
 
 	const nextClassBtn = document.getElementById("questionnaire-next");
@@ -200,43 +200,11 @@ function submitQuestionnaire(){
 	// TODO Complete submission stuff
 }
 
-function createQuestionnaire(classDoc){
-		classDoc.insertAdjacentHTML("beforeend",
-			`
-						<p class="class-prompt">I am taking this class because...</P>
-						<div class="questions-wrapper">
-							<div class="likert">
-								<p class="likertQuestion">I'm interested in the subject matter</p>
-							</div>
-							<div class="likert">
-								<p class="likertQuestion">I like the professor</p>
-							</div>
-							<div class="likert">
-								<p class="likertQuestion">It's important to my career</p>
-							</div>
-							<div class="likert">
-								<p class="likertQuestion">It fits my schedule</p>
-							</div>
-							<div class="likert">
-								<p class="likertQuestion">It fits a general education requirement</p>
-							</div>
-							<div class="likert">
-								<p class="likertQuestion">It is required for my major</p>
-							</div>
-							<div class="likert">
-								<p class="likertQuestion">I think it'll be a valuable experience</p>
-							</div>
-							<label class="likertQuestion" for="additional-thoughts">Additional thoughts...</p>
-								<textarea id="additional-thoughts" name="additional-thoughts" rows="4" cols="40">More information on why you're taking this class...</textarea>
-						</div>
-			`
-		);
-		addLikertScales(classDoc);
-}
-
-function addLikertScales(classDoc){
+function addLikertScales(classDoc, parentId){
 		const items = classDoc.querySelectorAll(".likert");
+		let i = 1;
 		items.forEach((question) => {
+			const name = "" + classDoc.id + i;
 			question.insertAdjacentHTML("beforeend", 
 				`
 					<div class="likertLabels">
@@ -244,14 +212,15 @@ function addLikertScales(classDoc){
 						<p>Agree</p>
 					</div>
 					<div class ="likertBtns">
-						<input name="1" type="radio" value="1" />
-						<input name="1" type="radio" value="2" />
-						<input name="1" type="radio" value="3" />
-						<input name="1" type="radio" value="4" />
-						<input name="1" type="radio" value="5" />
+						<input name="` + name + `" type="radio" value="1" />
+						<input name="` + name + `" type="radio" value="2" />
+						<input name="` + name + `" type="radio" value="3" />
+						<input name="` + name + `" type="radio" value="4" />
+						<input name="` + name + `" type="radio" value="5" />
 					</div>
 					`
 			);
+			i++;
 		});
 }
 
