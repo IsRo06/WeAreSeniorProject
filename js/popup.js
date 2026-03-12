@@ -63,10 +63,10 @@ function refreshImage() {
   const mood = eatingToggle?.checked
     ? "eating"
     : hungerToggle?.checked
-    ? "hungry"
-    : moodToggle?.checked
-    ? "happy"
-    : "normal";
+      ? "hungry"
+      : moodToggle?.checked
+        ? "happy"
+        : "normal";
 
   if (!PATHS[previewPet] || !PATHS[previewPet][mood]) {
     console.log("Missing path for:", previewPet, mood);
@@ -224,11 +224,34 @@ document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) =
 
       setClass(currClassInd);
     });
+
+    submitBtn.addEventListener("click", () => {
+      submitQuestionnaire();
+    });
   }
 });
 
 function submitQuestionnaire() {
-  // TODO Complete submission stuff
+  const submitBtn = document.getElementById("questionnaire-submit");
+  const answers = [];
+
+  document.querySelectorAll(".likert").forEach((likert) => {
+    const question = likert.querySelector(".likertQuestion").textContent.trim();
+    const selected = likert.querySelector("input[type='radio']:checked");
+    answers.push({
+      question,
+      answer: selected ? Number(selected.value) : null
+    });
+  });
+
+  chrome.storage.local.set({ motivationAnswers: answers }, function () {
+    // Clear cached whyImportant since we have a new context
+    chrome.storage.local.remove(["assignments", "updatedAt"]);
+
+    console.log("Questionnaire answers saved:", answers);
+    submitBtn.textContent = "Submitted!";
+    setTimeout(() => { submitBtn.textContent = "Submit"; }, 2000);
+  });
 }
 
 function addLikertScales(classDoc, parentId) {
@@ -245,20 +268,20 @@ function addLikertScales(classDoc, parentId) {
         </div>
         <div class ="likertBtns">
           <input name="` +
-        name +
-        `" type="radio" value="1" />
+      name +
+      `" type="radio" value="1" />
           <input name="` +
-        name +
-        `" type="radio" value="2" />
+      name +
+      `" type="radio" value="2" />
           <input name="` +
-        name +
-        `" type="radio" value="3" />
+      name +
+      `" type="radio" value="3" />
           <input name="` +
-        name +
-        `" type="radio" value="4" />
+      name +
+      `" type="radio" value="4" />
           <input name="` +
-        name +
-        `" type="radio" value="5" />
+      name +
+      `" type="radio" value="5" />
         </div>
         `
     );
