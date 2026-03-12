@@ -1,8 +1,19 @@
 // Everything in this file is loaded into the browser context
-//kskskkskks
 // CONSTANTS
 const domain = window.location.origin;
-let assignments = null;
+let assignments = [];
+
+const colorBg = "#094b80";
+const colorBgDark = "#07375F";
+const colorScene = "#6B9AC4";
+const colorBtn = colorBgDark;
+const colorBarBg = "#ddd";
+const colorBarGreen = "#659B5E";
+
+let pet = {
+  mood: "happy",
+  wellbeing: "good",
+};
 
 // Storage helper to save and retrieve assignments from Chrome's local storage
 const Storage = {
@@ -27,15 +38,15 @@ const Storage = {
   },
 };
 
-let isDog = false;
+let animalType = "cat";
 
 console.log("Canvas Pet content.js loaded");
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && changes.dogSelected) {
-    const newValue = changes.dogSelected.newValue;
-    isDog = newValue;
-    console.log("Is Dog: " + isDog);
+  if (area === "local" && changes.selectedPet) {
+    const newValue = changes.selectedPet.newValue;
+    animalType = newValue;
+    console.log("Animal Type: " + animalType);
   }
 });
 
@@ -79,28 +90,42 @@ function organizeAssignments(assignments) {
 // start the extension
 function startExtension() {
   console.log("This is Canvas! Incoming Pets!");
-
   console.log("Page title: ", document.title);
 
   hideTodo();
 
-  // Get assignments from storage or fetch from API if not available or outdated
-  let assignments = getAssignmentsFromStorageOrFetch(getPlannerItems).then(
-    (assignments) => {
-      console.log("Assignments ready for use: ", assignments);
+  chrome.storage.local.get(["pet"], (result) => {
+    if (result.pet) {
+      pet = result.pet;
+
+      const moodToggle = document.getElementById("moodToggle");
+      moodToggle.checked = pet.mood === "happy";
+
+      updatePet(moodToggle, document.getElementById("petImg"));
     }
-  );
+  });
+
+  // Get assignments from storage or fetch from API if not available or outdated
+  getAssignmentsFromStorageOrFetch(getPlannerItems).then((result) => {
+    assignments = result;
+    console.log("Assignments ready for use: ", assignments);
+  });
 }
 
 async function getPlannerItems() {
   // API endpoint to get planner items for a specific date range
   // filtering for incomplete items
   // limiting to 100 results per page
+  const today = new Date().toISOString().split("T")[0];
+  const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
+
   const url =
     domain +
     "/api/v1/planner/items" +
-    "?start_date=2026-02-04" +
-    "&end_date=2026-03-16" +
+    `?start_date=${today}` +
+    `&end_date=${future}` +
     "&filter=incomplete_items" +
     "&per_page=100";
 
@@ -111,13 +136,34 @@ async function getPlannerItems() {
       throw new Error("Network response was not ok: " + response.statusText);
     }
 
-    let data = await response.json();
+    const data = await response.json();
 
     // Filter for assignments only
-    assignments = data.filter((item) => item.plannable_type === "assignment");
+    const rawAssignments = data.filter(
+      (item) => item.plannable_type === "assignment"
+    );
+
+    // Normalize the assignment data
+    assignments = await Promise.all(rawAssignments.map(normalizeAssignment));
+
+    console.log("Fetched and normalized assignments: ", assignments);
+
+    return assignments;
   } catch (error) {
     console.error("Error fetching planner items:", error);
   }
+}
+
+// Normalize assignments
+async function normalizeAssignment(item) {
+  return {
+    id: item.plannable_id,
+    title: item.plannable?.title || "Untitled",
+    dueAt: item.plannable?.due_at || null,
+    course: item.context_name || "No Course",
+    whyImportant: null, // only generate if the user clicks on the assignment, to save API calls
+    completed: false,
+  };
 }
 
 // get assignments from storage or fetch from API if not available or outdated
@@ -204,32 +250,35 @@ function createPetImages() {
   motivationMsg.textContent = "I am motivating!";
   motivationMsg.id = "pet-motivation-msg";
 
-  parentDoc.style.backgroundColor = "#ffa362";
+  parentDoc.style.backgroundColor = colorBg;
   parentDoc.style.borderRadius = "5px";
   parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
   parentDoc.style.padding = "5px";
   parentDoc.style.margin = "10px";
 
-  petScene.style.backgroundColor = "#FFF585";
+  petScene.style.backgroundColor = colorScene;
   petScene.style.padding = "10px";
   petScene.style.borderRadius = "5px";
 
   motivationMsg.style.backgroundColor = "white";
-  motivationMsg.style.textAlign = "left";
-  motivationMsg.style.marginLeft = "auto";
-  motivationMsg.style.marginRight = "auto";
-  motivationMsg.style.borderRadius = "3px";
-  motivationMsg.style.width = "50%";
-  motivationMsg.style.padding = "5px";
+  motivationMsg.style.borderRadius = "8px";
+  motivationMsg.style.padding = "8px";
+  motivationMsg.style.margin = "8px auto";
+  motivationMsg.style.maxWidth = "260px";
+  motivationMsg.style.maxHeight = "120px";
+  motivationMsg.style.overflowY = "auto";
+  motivationMsg.style.lineHeight = "1.4";
+  motivationMsg.style.fontSize = "13px";
+  motivationMsg.style.boxSizing = "border-box";
 
   const animalPaths = getAnimalPaths();
   petImg.alt = "Image of cat wagging tail";
   petImg.id = "petImg";
 
-  petRefreshBtn.style.backgroundColor = "#FFF585";
+  petRefreshBtn.style.backgroundColor = colorBtn;
   petRefreshBtn.style.border = "none";
   petRefreshBtn.style.borderRadius = "5px";
-  petRefreshBtn.style.color = "#000";
+  petRefreshBtn.style.color = "white";
   petRefreshBtn.style.padding = "10px";
   petRefreshBtn.style.textAlign = "center";
   petRefreshBtn.style.cursor = "pointer";
@@ -238,10 +287,10 @@ function createPetImages() {
   petRefreshBtn.style.marginTop = "4px";
   petRefreshBtn.textContent = "Refresh Pet!";
 
-  petMotivateBtn.style.backgroundColor = "#FFF585";
+  petMotivateBtn.style.backgroundColor = colorBtn;
   petMotivateBtn.style.border = "none";
   petMotivateBtn.style.borderRadius = "5px";
-  petMotivateBtn.style.color = "#000";
+  petMotivateBtn.style.color = "white";
   petMotivateBtn.style.padding = "10px";
   petMotivateBtn.style.textAlign = "center";
   petMotivateBtn.style.cursor = "pointer";
@@ -252,12 +301,16 @@ function createPetImages() {
 
   moodToggleLabel.for = "moodToggle";
   moodToggleLabel.textContent = "Happy";
+  moodToggleLabel.style.color = "white";
   moodToggleCheck.type = "checkbox";
   moodToggleCheck.id = "moodToggle";
   updatePet(moodToggleCheck, petImg);
 
-  moodToggleCheck.addEventListener("change", () => {
+  moodToggleCheck.addEventListener("change", async () => {
     updatePet(moodToggleCheck, petImg);
+
+    pet.mood = moodToggleCheck.checked ? "happy" : "neutral";
+    await chrome.storage.local.set({ petMood: pet.mood });
   });
 
   petRefreshBtn.addEventListener("click", () => {
@@ -285,13 +338,13 @@ function createToDoList() {
 
   const header = document.createElement("h3");
 
-  parentDoc.style.backgroundColor = "#ffa362";
+  parentDoc.style.backgroundColor = colorBg;
   parentDoc.style.borderRadius = "5px";
   parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
   parentDoc.style.paddingTop = "12px";
   parentDoc.style.paddingLeft = "12px";
   parentDoc.style.paddingRight = "12px";
-  parentDoc.style.paddingBottom = "250px";
+  parentDoc.style.paddingBottom = "200px";
   parentDoc.style.margin = "10px";
 
   parentDoc.style.display = "flex";
@@ -306,23 +359,25 @@ function createToDoList() {
 
   parentDoc.appendChild(header);
 
-  getAssignmentsFromStorageOrFetch(getPlannerItems).then((assignments) => {
+  getAssignmentsFromStorageOrFetch(getPlannerItems).then((result) => {
+    assignments = result;
+
     const { toDoAssignments } = organizeAssignments(assignments);
 
     toDoAssignments
-      .filter((a) => isWithinNext7Days(a.plannable_date))
+      .filter((a) => isWithinNext7Days(a.dueAt))
       .forEach((a) => {
         const card = document.createElement("div");
         const title = document.createElement("div");
         const due = document.createElement("div");
 
-        title.textContent = a.plannable?.title || "Untitled";
+        title.textContent = a.title || "Untitled";
 
-        const dueDate = new Date(a.plannable_date);
+        const dueDate = new Date(a.dueAt);
         const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
         due.textContent = dueDateDisplay.slice(0, -5);
 
-        card.style.backgroundColor = "#ff8f3f";
+        card.style.backgroundColor = colorBgDark;
         card.style.borderRadius = "5px";
         card.style.padding = "8px 10px";
         card.style.marginTop = "8px";
@@ -333,6 +388,7 @@ function createToDoList() {
         card.style.display = "flex";
         card.style.justifyContent = "space-between";
         card.style.alignItems = "flex-start";
+        card.style.cursor = "pointer";
 
         due.style.fontSize = "12px";
         due.style.opacity = "0.9";
@@ -340,10 +396,28 @@ function createToDoList() {
         card.appendChild(title);
         card.appendChild(due);
         parentDoc.appendChild(card);
+
+        card.addEventListener("click", async () => {
+          await handleAssignmentClick(a.id);
+        });
       });
   });
 
   return parentDoc;
+}
+
+// handle click on assignment
+async function handleAssignmentClick(id) {
+  const assignment = assignments.find((a) => a.id === id);
+  const motivationMsg = document.getElementById("pet-motivation-msg");
+
+  if (!assignment.whyImportant) {
+    assignment.whyImportant = await determineWhyImportant(assignment);
+    await Storage.setAssignments(assignments);
+  }
+
+  // diplay the importance of the assignment as the pet's message
+  displayMotivation(assignment.whyImportant, motivationMsg);
 }
 
 function isWithinNext7Days(dueDateStr) {
@@ -361,7 +435,7 @@ function createPetStats() {
   const moodStatBar = createStatBar("Mood", 85);
   const wellbeingStatBar = createStatBar("Well-being", 40);
 
-  parentDoc.style.backgroundColor = "#ffa362";
+  parentDoc.style.backgroundColor = colorBg;
   parentDoc.style.borderRadius = "5px";
   parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
   parentDoc.style.padding = "5px";
@@ -408,14 +482,14 @@ function createStatBar(label, percent) {
   bar.style.gap = "5px";
   bar.style.margin = "0px";
 
-  barBg.style.backgroundColor = "#dddddd";
+  barBg.style.backgroundColor = colorBarBg;
   barBg.style.height = "20px";
   barBg.style.width = "100%";
   barBg.style.display = "flex";
   barBg.style.alignItems = "center";
   barBg.style.borderRadius = "10px";
 
-  barFill.style.backgroundColor = "#4ec67f";
+  barFill.style.backgroundColor = colorBarGreen;
   barFill.style.height = "100%";
   barFill.style.width = percent + "%";
   barFill.style.borderRadius = "10px";
@@ -429,7 +503,7 @@ function createStatBar(label, percent) {
 }
 
 function updatePet(moodToggle, imageElement) {
-  const animal = isDog ? "dog" : "cat";
+  const animal = animalType;
   const mood = moodToggle.checked ? "happy" : "normal";
 
   const paths = getAnimalPaths();
@@ -467,6 +541,40 @@ async function GetMotivation() {
   } catch (error) {
     console.error("LLM Error:", error);
     return "You got this!";
+  }
+}
+
+// Helper to display why an assignment is important based on its details (e.g. due date, course, etc.)
+async function determineWhyImportant(assignment) {
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `Given the following assignment details, explain in 1-2 sentences why this assignment might be important for a student to complete:\n\nTitle: ${assignment.title}\nCourse: ${assignment.course}\nDue Date: ${assignment.dueAt}`,
+                },
+              ],
+            },
+          ],
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    console.log("Gemini importance response:", data);
+    return data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error("LLM Error:", error);
+    return "This assignment is important for your learning and success in the course!";
   }
 }
 
