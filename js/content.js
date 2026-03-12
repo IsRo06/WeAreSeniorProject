@@ -577,7 +577,7 @@ function getMotivationContext() {
 
     console.log("Motivation questionnaire summary for LLM context: ", summary);
 
-    return `\n\nThe student answered a motivation questionnaire (1=disagree, 5=agree):\n${summary}\nAnalyze and mention these to encourage the student and make the motivation message more personalized.`;
+    return `\n\nThe student answered a motivation questionnaire (1=disagree, 5=agree):\n${summary}\nAnalyze and mention" these to encourage the student and make the motivation message more personalized.`;
 }
 
 //LLM stuff
