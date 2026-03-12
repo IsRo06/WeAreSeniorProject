@@ -278,110 +278,137 @@ function renderCanvasPets(element) {
 }
 
 function createPetImages() {
-    const parentDoc = document.createElement("div");
+  const parentDoc = document.createElement("div");
 
-    const petScene = document.createElement("div");
+  const petScene = document.createElement("div");
 
-    const motivationMsg = document.createElement("p");
-    const petImg = document.createElement("img");
+  const motivationMsg = document.createElement("p");
+  const petImg = document.createElement("img");
 
-    const petRefreshBtn = document.createElement("button");
-    const petMotivateBtn = document.createElement("button");
-    const spacer = document.createElement("br");
+  const petHouse = document.createElement("img");
+  petHouse.id = "petHouse";
+  petHouse.src = chrome.runtime.getURL("/Images/PetHouse.png");
+  petHouse.alt = "Pet House";
 
-    const moodToggleLabel = document.createElement("label");
-    const moodToggleCheck = document.createElement("input");
+  const petRefreshBtn = document.createElement("button");
+  const petMotivateBtn = document.createElement("button");
+  const spacer = document.createElement("br");
 
-    motivationMsg.textContent = "I am motivating!";
-    motivationMsg.id = "pet-motivation-msg";
+  const moodToggleLabel = document.createElement("label");
+  const moodToggleCheck = document.createElement("input");
 
-    parentDoc.style.backgroundColor = colorBg;
-    parentDoc.style.borderRadius = "5px";
-    parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
-    parentDoc.style.padding = "5px";
-    parentDoc.style.margin = "10px";
+  motivationMsg.textContent = "I am motivating!";
+  motivationMsg.id = "pet-motivation-msg";
 
-    petScene.style.backgroundColor = colorScene;
-    petScene.style.padding = "10px";
-    petScene.style.borderRadius = "5px";
+  parentDoc.style.backgroundColor = colorBg;
+  parentDoc.style.borderRadius = "5px";
+  parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+  parentDoc.style.padding = "5px";
+  parentDoc.style.margin = "10px";
 
-    motivationMsg.style.backgroundColor = "white";
-    motivationMsg.style.borderRadius = "8px";
-    motivationMsg.style.padding = "8px";
-    motivationMsg.style.margin = "8px auto";
-    motivationMsg.style.maxWidth = "260px";
-    motivationMsg.style.maxHeight = "120px";
-    motivationMsg.style.overflowY = "auto";
-    motivationMsg.style.lineHeight = "1.4";
-    motivationMsg.style.fontSize = "13px";
-    motivationMsg.style.boxSizing = "border-box";
+  petScene.style.backgroundColor = colorScene;
+  petScene.style.padding = "10px";
+  petScene.style.borderRadius = "5px";
 
-    const animalPaths = getAnimalPaths();
-    petImg.alt = "Image of cat wagging tail";
-    petImg.id = "petImg";
+  motivationMsg.style.backgroundColor = "white";
+  motivationMsg.style.borderRadius = "8px";
+  motivationMsg.style.padding = "8px";
+  motivationMsg.style.margin = "8px auto";
+  motivationMsg.style.maxWidth = "260px";
+  motivationMsg.style.maxHeight = "120px";
+  motivationMsg.style.overflowY = "auto";
+  motivationMsg.style.lineHeight = "1.4";
+  motivationMsg.style.fontSize = "13px";
+  motivationMsg.style.boxSizing = "border-box";
 
-    petRefreshBtn.style.backgroundColor = colorBtn;
-    petRefreshBtn.style.border = "none";
-    petRefreshBtn.style.borderRadius = "5px";
-    petRefreshBtn.style.color = "white";
-    petRefreshBtn.style.padding = "10px";
-    petRefreshBtn.style.textAlign = "center";
-    petRefreshBtn.style.cursor = "pointer";
-    petRefreshBtn.style.marginLeft = "auto";
-    petRefreshBtn.style.marginRight = "auto";
-    petRefreshBtn.style.marginTop = "4px";
-    petRefreshBtn.textContent = "Refresh Pet!";
+  petImg.alt = "Image of pet";
+  petImg.id = "petImg";
 
-    petMotivateBtn.style.backgroundColor = colorBtn;
-    petMotivateBtn.style.border = "none";
-    petMotivateBtn.style.borderRadius = "5px";
-    petMotivateBtn.style.color = "white";
-    petMotivateBtn.style.padding = "10px";
-    petMotivateBtn.style.textAlign = "center";
-    petMotivateBtn.style.cursor = "pointer";
-    petMotivateBtn.style.marginLeft = "auto";
-    petMotivateBtn.style.marginRight = "auto";
-    petMotivateBtn.style.marginTop = "4px";
-    petMotivateBtn.textContent = "Get Motivation!";
+  petRefreshBtn.style.backgroundColor = colorBtn;
+  petRefreshBtn.style.border = "none";
+  petRefreshBtn.style.borderRadius = "5px";
+  petRefreshBtn.style.color = "white";
+  petRefreshBtn.style.padding = "10px";
+  petRefreshBtn.style.textAlign = "center";
+  petRefreshBtn.style.cursor = "pointer";
+  petRefreshBtn.style.marginLeft = "auto";
+  petRefreshBtn.style.marginRight = "auto";
+  petRefreshBtn.style.marginTop = "4px";
+  petRefreshBtn.textContent = "Refresh Pet!";
 
-    moodToggleLabel.for = "moodToggle";
-    moodToggleLabel.textContent = "Happy";
-    moodToggleLabel.style.color = "white";
-    moodToggleCheck.type = "checkbox";
-    moodToggleCheck.id = "moodToggle";
+  petMotivateBtn.style.backgroundColor = colorBtn;
+  petMotivateBtn.style.border = "none";
+  petMotivateBtn.style.borderRadius = "5px";
+  petMotivateBtn.style.color = "white";
+  petMotivateBtn.style.padding = "10px";
+  petMotivateBtn.style.textAlign = "center";
+  petMotivateBtn.style.cursor = "pointer";
+  petMotivateBtn.style.marginLeft = "auto";
+  petMotivateBtn.style.marginRight = "auto";
+  petMotivateBtn.style.marginTop = "4px";
+  petMotivateBtn.textContent = "Get Motivation!";
+
+  moodToggleLabel.for = "moodToggle";
+  moodToggleLabel.textContent = "Happy";
+  moodToggleLabel.style.color = "white";
+  moodToggleCheck.type = "checkbox";
+  moodToggleCheck.id = "moodToggle";
+
+  updatePet(moodToggleCheck, petImg);
+
+  moodToggleCheck.addEventListener("change", async () => {
     updatePet(moodToggleCheck, petImg);
 
-    moodToggleCheck.addEventListener("change", async () => {
-        updatePet(moodToggleCheck, petImg);
+    pet.mood = moodToggleCheck.checked ? "happy" : "neutral";
+    await chrome.storage.local.set({ petMood: pet.mood });
+  });
 
-        pet.mood = moodToggleCheck.checked ? "happy" : "neutral";
-        await chrome.storage.local.set({ petMood: pet.mood });
-    });
+  petRefreshBtn.addEventListener("click", () => {
+    updatePet(moodToggleCheck, petImg);
+  });
 
-    petRefreshBtn.addEventListener("click", () => {
-        updatePet(moodToggleCheck, petImg);
-    });
+  petMotivateBtn.addEventListener("click", () => {
+    motivationMsg.textContent = "Thinking...";
+    PromptLLM(motivationMsg);
+  });
 
-    petMotivateBtn.addEventListener("click", () => {
-        PromptLLM(motivationMsg);
-    });
+  const petRow = document.createElement("div");
+  petRow.id = "petRow";
 
-    petMotivateBtn.addEventListener("click", () => {
-        motivationMsg.textContent = "Thinking...";
-        PromptLLM(motivationMsg);
-    });
+  petRow.style.display = "flex";
+  petRow.style.alignItems = "flex-end";
+  petRow.style.justifyContent = "space-between";
+  petRow.style.width = "100%";
+  petRow.style.marginTop = "0px";
 
+  petImg.style.display = "block";
+  petImg.style.width = "72px";
+  petImg.style.height = "72px";
+  petImg.style.objectFit = "contain";
 
-    parentDoc.appendChild(petScene);
-    petScene.appendChild(motivationMsg);
-    petScene.appendChild(petImg);
-    parentDoc.appendChild(petRefreshBtn);
-    parentDoc.appendChild(petMotivateBtn);
-    parentDoc.appendChild(spacer);
+  petHouse.style.display = "block";
+  petHouse.style.width = "110px";
+  petHouse.style.height = "110px";
+  petHouse.style.objectFit = "contain";
+  petHouse.style.imageRendering = "pixelated";
+  petHouse.style.marginLeft = "auto";
 
-    return parentDoc;
+  petRow.appendChild(petImg);
+  petRow.appendChild(petHouse);
+
+  parentDoc.appendChild(petScene);
+  petScene.appendChild(motivationMsg);
+  petScene.appendChild(petRow);
+
+  parentDoc.appendChild(petRefreshBtn);
+  parentDoc.appendChild(petMotivateBtn);
+  parentDoc.appendChild(spacer);
+
+  // parentDoc.appendChild(moodToggleCheck);
+  // parentDoc.appendChild(moodToggleLabel);
+
+  return parentDoc;
 }
-
 
 function createToDoList() {
     const parentDoc = document.createElement("div");
