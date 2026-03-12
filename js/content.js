@@ -44,18 +44,24 @@ let animalType = "cat1";
 console.log("Canvas Pet content.js loaded");
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if (area === "local" && changes.selectedPet) {
-    const newValue = changes.selectedPet.newValue;
-    animalType = newValue;
-    console.log("Animal Type: " + animalType);
+    if (area === "local" && changes.selectedPet) {
+        const newValue = changes.selectedPet.newValue;
+        animalType = newValue;
+        console.log("Animal Type: " + animalType);
 
-    const petImg = document.getElementById("petImg");
-    const moodToggle = document.getElementById("moodToggle");
+        const petImg = document.getElementById("petImg");
+        const moodToggle = document.getElementById("moodToggle");
 
-    if (petImg && moodToggle) {
-      updatePet(moodToggle, petImg);
+        if (petImg && moodToggle) {
+            updatePet(moodToggle, petImg);
+        }
     }
-  }
+
+    // listen for changes to motivation answers to update the context for the LLM and the pet's motivational messages
+    if (area === "local" && changes.motivationAnswers) {
+        motivationAnswers = changes.motivationAnswers.newValue;
+        console.log("Motivation answers updated:", motivationAnswers);
+    }
 });
 
 isDomainCanvas();
@@ -102,18 +108,18 @@ function startExtension() {
 
     hideTodo();
 
-  chrome.storage.local.get(["selectedPet"], (result) => {
-    if (result.selectedPet) {
-      animalType = result.selectedPet;
-      console.log("Loaded selected pet:", animalType);
-    }
-  });
+    chrome.storage.local.get(["selectedPet"], (result) => {
+        if (result.selectedPet) {
+            animalType = result.selectedPet;
+            console.log("Loaded selected pet:", animalType);
+        }
+    });
 
-  chrome.storage.local.get(["pet"], (result) => {
-    if (result.pet) {
-      pet = result.pet;
-    }
-  });
+    chrome.storage.local.get(["pet"], (result) => {
+        if (result.pet) {
+            pet = result.pet;
+        }
+    });
 
     chrome.storage.local.get(["motivationAnswers"], (result) => {
         console.log("Motivation answers on load:", result.motivationAnswers);
@@ -123,6 +129,7 @@ function startExtension() {
     getAssignmentsFromStorageOrFetch(getPlannerItems).then((result) => {
         assignments = result;
         console.log("Assignments ready for use: ", assignments);
+        renderCanvasPets(document.querySelector("aside")); // move here
     });
 }
 
@@ -207,44 +214,44 @@ async function getAssignmentsFromStorageOrFetch(
 }
 
 function getAnimalPaths() {
-  return {
-    cat1: {
-      normal: chrome.runtime.getURL("/Images/Cat/CatWagTail.gif"),
-      happy: chrome.runtime.getURL("/Images/Cat/CatHappy.gif"),
-      hungry: chrome.runtime.getURL("/Images/Cat/CatHungry.gif"),
-      eating: chrome.runtime.getURL("/Images/Cat/CatEating.gif"),
-    },
-    cat2: {
-      normal: chrome.runtime.getURL("/Images/Cat/Cat2Wag.gif"),
-      happy: chrome.runtime.getURL("/Images/Cat/Cat2Happy.gif"),
-      hungry: chrome.runtime.getURL("/Images/Cat/Cat2Hungry.gif"),
-      eating: chrome.runtime.getURL("/Images/Cat/Cat2Eating.gif"),
-    },
-    cat3: {
-      normal: chrome.runtime.getURL("/Images/Cat/Cat3Wag.gif"),
-      happy: chrome.runtime.getURL("/Images/Cat/Cat3Happy.gif"),
-      hungry: chrome.runtime.getURL("/Images/Cat/Cat3Hungry.gif"),
-      eating: chrome.runtime.getURL("/Images/Cat/Cat3Eating.gif"),
-    },
-    dog1: {
-      normal: chrome.runtime.getURL("/Images/Dog/DogTailWag.gif"),
-      happy: chrome.runtime.getURL("/Images/Dog/Happy Dog.gif"),
-      hungry: chrome.runtime.getURL("/Images/Dog/DogHungry.gif"),
-      eating: chrome.runtime.getURL("/Images/Dog/DogEating.gif"),
-    },
-    dog2: {
-      normal: chrome.runtime.getURL("/Images/Dog/Dog2Wag.gif"),
-      happy: chrome.runtime.getURL("/Images/Dog/Dog2Happy.gif"),
-      hungry: chrome.runtime.getURL("/Images/Dog/Dog2Hungry.gif"),
-      eating: chrome.runtime.getURL("/Images/Dog/Dog2Eating.gif"),
-    },
-    dog3: {
-      normal: chrome.runtime.getURL("/Images/Dog/Dog3Wag.gif"),
-      happy: chrome.runtime.getURL("/Images/Dog/Dog3Happy.gif"),
-      hungry: chrome.runtime.getURL("/Images/Dog/Dog3Hungry.gif"),
-      eating: chrome.runtime.getURL("/Images/Dog/Dog3Eating.gif"),
-    },
-  };
+    return {
+        cat1: {
+            normal: chrome.runtime.getURL("/Images/Cat/CatWagTail.gif"),
+            happy: chrome.runtime.getURL("/Images/Cat/CatHappy.gif"),
+            hungry: chrome.runtime.getURL("/Images/Cat/CatHungry.gif"),
+            eating: chrome.runtime.getURL("/Images/Cat/CatEating.gif"),
+        },
+        cat2: {
+            normal: chrome.runtime.getURL("/Images/Cat/Cat2Wag.gif"),
+            happy: chrome.runtime.getURL("/Images/Cat/Cat2Happy.gif"),
+            hungry: chrome.runtime.getURL("/Images/Cat/Cat2Hungry.gif"),
+            eating: chrome.runtime.getURL("/Images/Cat/Cat2Eating.gif"),
+        },
+        cat3: {
+            normal: chrome.runtime.getURL("/Images/Cat/Cat3Wag.gif"),
+            happy: chrome.runtime.getURL("/Images/Cat/Cat3Happy.gif"),
+            hungry: chrome.runtime.getURL("/Images/Cat/Cat3Hungry.gif"),
+            eating: chrome.runtime.getURL("/Images/Cat/Cat3Eating.gif"),
+        },
+        dog1: {
+            normal: chrome.runtime.getURL("/Images/Dog/DogTailWag.gif"),
+            happy: chrome.runtime.getURL("/Images/Dog/Happy Dog.gif"),
+            hungry: chrome.runtime.getURL("/Images/Dog/DogHungry.gif"),
+            eating: chrome.runtime.getURL("/Images/Dog/DogEating.gif"),
+        },
+        dog2: {
+            normal: chrome.runtime.getURL("/Images/Dog/Dog2Wag.gif"),
+            happy: chrome.runtime.getURL("/Images/Dog/Dog2Happy.gif"),
+            hungry: chrome.runtime.getURL("/Images/Dog/Dog2Hungry.gif"),
+            eating: chrome.runtime.getURL("/Images/Dog/Dog2Eating.gif"),
+        },
+        dog3: {
+            normal: chrome.runtime.getURL("/Images/Dog/Dog3Wag.gif"),
+            happy: chrome.runtime.getURL("/Images/Dog/Dog3Happy.gif"),
+            hungry: chrome.runtime.getURL("/Images/Dog/Dog3Hungry.gif"),
+            eating: chrome.runtime.getURL("/Images/Dog/Dog3Eating.gif"),
+        },
+    };
 }
 
 function renderCanvasPets(element) {
@@ -356,19 +363,14 @@ function createPetImages() {
     });
 
     petMotivateBtn.addEventListener("click", () => {
+        PromptLLM(motivationMsg);
+    });
+
+    petMotivateBtn.addEventListener("click", () => {
         motivationMsg.textContent = "Thinking...";
         PromptLLM(motivationMsg);
     });
 
-  parentDoc.appendChild(petScene);
-  petScene.appendChild(motivationMsg);
-  petScene.appendChild(petImg);
-  parentDoc.appendChild(petRefreshBtn);
-  parentDoc.appendChild(petMotivateBtn);
-  parentDoc.appendChild(spacer);
-  //parentDoc.appendChild(moodToggleCheck);
-  //parentDoc.appendChild(moodToggleLabel);
-   
 
     parentDoc.appendChild(petScene);
     petScene.appendChild(motivationMsg);
@@ -376,11 +378,10 @@ function createPetImages() {
     parentDoc.appendChild(petRefreshBtn);
     parentDoc.appendChild(petMotivateBtn);
     parentDoc.appendChild(spacer);
-    parentDoc.appendChild(moodToggleCheck);
-    parentDoc.appendChild(moodToggleLabel);
 
     return parentDoc;
 }
+
 
 function createToDoList() {
     const parentDoc = document.createElement("div");
@@ -408,49 +409,45 @@ function createToDoList() {
 
     parentDoc.appendChild(header);
 
-    getAssignmentsFromStorageOrFetch(getPlannerItems).then((result) => {
-        assignments = result;
+    const { toDoAssignments } = organizeAssignments(assignments);
 
-        const { toDoAssignments } = organizeAssignments(assignments);
+    toDoAssignments
+        .filter((a) => isWithinNext7Days(a.dueAt))
+        .forEach((a) => {
+            const card = document.createElement("div");
+            const title = document.createElement("div");
+            const due = document.createElement("div");
 
-        toDoAssignments
-            .filter((a) => isWithinNext7Days(a.dueAt))
-            .forEach((a) => {
-                const card = document.createElement("div");
-                const title = document.createElement("div");
-                const due = document.createElement("div");
+            title.textContent = a.title || "Untitled";
 
-                title.textContent = a.title || "Untitled";
+            const dueDate = new Date(a.dueAt);
+            const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
+            due.textContent = dueDateDisplay.slice(0, -5);
 
-                const dueDate = new Date(a.dueAt);
-                const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
-                due.textContent = dueDateDisplay.slice(0, -5);
+            card.style.backgroundColor = colorBgDark;
+            card.style.borderRadius = "5px";
+            card.style.padding = "8px 10px";
+            card.style.marginTop = "8px";
+            card.style.width = "100%";
+            card.style.color = "white";
+            card.style.boxSizing = "border-box";
 
-                card.style.backgroundColor = colorBgDark;
-                card.style.borderRadius = "5px";
-                card.style.padding = "8px 10px";
-                card.style.marginTop = "8px";
-                card.style.width = "100%";
-                card.style.color = "white";
-                card.style.boxSizing = "border-box";
+            card.style.display = "flex";
+            card.style.justifyContent = "space-between";
+            card.style.alignItems = "flex-start";
+            card.style.cursor = "pointer";
 
-                card.style.display = "flex";
-                card.style.justifyContent = "space-between";
-                card.style.alignItems = "flex-start";
-                card.style.cursor = "pointer";
+            due.style.fontSize = "12px";
+            due.style.opacity = "0.9";
 
-                due.style.fontSize = "12px";
-                due.style.opacity = "0.9";
+            card.appendChild(title);
+            card.appendChild(due);
+            parentDoc.appendChild(card);
 
-                card.appendChild(title);
-                card.appendChild(due);
-                parentDoc.appendChild(card);
-
-                card.addEventListener("click", async () => {
-                    await handleAssignmentClick(a.id);
-                });
+            card.addEventListener("click", async () => {
+                await handleAssignmentClick(a.id);
             });
-    });
+        });
 
     return parentDoc;
 }
@@ -554,21 +551,22 @@ function createStatBar(label, percent) {
 }
 
 function updatePet(moodToggle, imageElement) {
-  const animal = animalType || "cat1";
-  const mood = moodToggle.checked ? "happy" : "normal";
+    const animal = animalType || "cat1";
+    const mood = moodToggle.checked ? "happy" : "normal";
 
-  const paths = getAnimalPaths();
+    const paths = getAnimalPaths();
 
-  if (!paths[animal] || !paths[animal][mood]) {
-    console.log("Missing pet path for:", animal, mood);
-    return;
-  }
+    if (!paths[animal] || !paths[animal][mood]) {
+        console.log("Missing pet path for:", animal, mood);
+        return;
+    }
 
-  console.log("Updating pet to:", animal, mood, paths[animal][mood]);
-  imageElement.src = paths[animal][mood];
+    console.log("Updating pet to:", animal, mood, paths[animal][mood]);
+    imageElement.src = paths[animal][mood];
 }
 
 function getMotivationContext() {
+    console.log("getMotivationContext called, motivationAnswers:", motivationAnswers);
     if (!motivationAnswers) return "";
 
     // summary of questionnaire answers to provide context to the LLM for generating motivation messages
@@ -579,7 +577,7 @@ function getMotivationContext() {
 
     console.log("Motivation questionnaire summary for LLM context: ", summary);
 
-    return `\n\nThe student answered a motivation questionnaire (1=disagree, 5=agree):\n${summary}\nUse this to personalize your message.`;
+    return `\n\nThe student answered a motivation questionnaire (1=disagree, 5=agree):\n${summary}\nAnalyze and mention these to encourage the student and make the motivation message more personalized.`;
 }
 
 //LLM stuff
@@ -659,5 +657,3 @@ async function PromptLLM(msgElement) {
     const motivationalMessage = await GetMotivation();
     displayMotivation(motivationalMessage, msgElement);
 }
-
-renderCanvasPets(document.querySelector("aside"));
