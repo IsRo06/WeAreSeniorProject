@@ -272,6 +272,11 @@ function createPetImages() {
   const motivationMsg = document.createElement("p");
   const petImg = document.createElement("img");
 
+  const petHouse = document.createElement("img");
+  petHouse.id = "petHouse";
+  petHouse.src = chrome.runtime.getURL("/Images/PetHouse.png");
+  petHouse.alt = "Pet House";
+
   const petRefreshBtn = document.createElement("button");
   const petMotivateBtn = document.createElement("button");
   const spacer = document.createElement("br");
@@ -289,13 +294,13 @@ function createPetImages() {
   parentDoc.style.margin = "10px";
 
   petScene.style.backgroundColor = colorScene;
-  petScene.style.padding = "10px";
+  petScene.style.padding = "1px";
   petScene.style.borderRadius = "5px";
 
   motivationMsg.style.backgroundColor = "white";
   motivationMsg.style.borderRadius = "8px";
   motivationMsg.style.padding = "8px";
-  motivationMsg.style.margin = "8px auto";
+  motivationMsg.style.margin = "6px auto";
   motivationMsg.style.maxWidth = "260px";
   motivationMsg.style.maxHeight = "120px";
   motivationMsg.style.overflowY = "auto";
@@ -354,8 +359,45 @@ function createPetImages() {
   });
 
   parentDoc.appendChild(petScene);
+
+
+
+
+  const petRow = document.createElement("div");
+  petRow.id = "petRow";
+
+  petRow.style.display = "flex";
+  petRow.style.alignItems = "flex-end";
+  petRow.style.justifyContent = "space-between";
+  petRow.style.width = "100%";
+  petRow.style.marginTop = "0px";
+  
+
+  petImg.style.display = "block";
+  petImg.style.width = "72px";
+  petImg.style.height = "72px";
+  petImg.style.objectFit = "contain";
+
+  petHouse.style.display = "block";
+  petHouse.style.width = "110px";
+  petHouse.style.height = "110px";
+  petHouse.style.objectFit = "contain";
+  petHouse.style.imageRendering = "pixelated";
+  petHouse.style.marginLeft = "auto";
+
+  
+  petRow.appendChild(petImg);
+  petRow.appendChild(petHouse);
   petScene.appendChild(motivationMsg);
-  petScene.appendChild(petImg);
+  petScene.appendChild(petRow);
+
+
+  // petScene.appendChild(motivationMsg);
+  // petScene.appendChild(petImg);
+  // petScene.appendChild(petHouse);
+
+
+  
   parentDoc.appendChild(petRefreshBtn);
   parentDoc.appendChild(petMotivateBtn);
   parentDoc.appendChild(spacer);
