@@ -368,8 +368,13 @@ function createPetImages() {
   });
 
   petMotivateBtn.addEventListener("click", () => {
-    motivationMsg.textContent = "Thinking...";
-    PromptLLM(motivationMsg);
+	if(!motivationAnswers){
+	  motivationMsg.textContent = "Please complete the motivation setup!";
+	}
+	else{
+      motivationMsg.textContent = "Thinking...";
+      PromptLLM(motivationMsg);
+	}
   });
 
   const petRow = document.createElement("div");
@@ -484,6 +489,11 @@ async function handleAssignmentClick(id) {
     const assignment = assignments.find((a) => a.id === id);
     const motivationMsg = document.getElementById("pet-motivation-msg");
     motivationMsg.textContent = "Thinking...";
+
+	if(!motivationAnswers){
+		motivationMsg.textContent = "Please complete motivation setup in the pop up!";
+		return;
+	}
 
 
     if (!assignment.whyImportant) {
