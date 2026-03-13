@@ -297,7 +297,13 @@ function createPetImages() {
   const moodToggleLabel = document.createElement("label");
   const moodToggleCheck = document.createElement("input");
 
-  motivationMsg.textContent = "I am motivating!";
+  if(motivationAnswers){
+	  motivationMsg.textContent = "You can do it!";
+  }
+	else{
+	  motivationMsg.textContent = "Please set up Canvas Pets with your motivations in the pop up!";
+  }
+
   motivationMsg.id = "pet-motivation-msg";
 
   parentDoc.style.backgroundColor = colorBg;
