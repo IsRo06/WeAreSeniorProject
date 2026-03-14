@@ -297,7 +297,13 @@ function createPetImages() {
   const moodToggleLabel = document.createElement("label");
   const moodToggleCheck = document.createElement("input");
 
-  motivationMsg.textContent = "I am motivating!";
+  if(motivationAnswers){
+	  motivationMsg.textContent = "You can do it!";
+  }
+	else{
+	  motivationMsg.textContent = "Please set up Canvas Pets with your motivations in the pop up!";
+  }
+
   motivationMsg.id = "pet-motivation-msg";
 
   parentDoc.style.backgroundColor = colorBg;
@@ -368,8 +374,13 @@ function createPetImages() {
   });
 
   petMotivateBtn.addEventListener("click", () => {
-    motivationMsg.textContent = "Thinking...";
-    PromptLLM(motivationMsg);
+	if(!motivationAnswers){
+	  motivationMsg.textContent = "Please complete the motivation setup!";
+	}
+	else{
+      motivationMsg.textContent = "Thinking...";
+      PromptLLM(motivationMsg);
+	}
   });
 
   const petRow = document.createElement("div");
@@ -484,6 +495,11 @@ async function handleAssignmentClick(id) {
     const assignment = assignments.find((a) => a.id === id);
     const motivationMsg = document.getElementById("pet-motivation-msg");
     motivationMsg.textContent = "Thinking...";
+
+	if(!motivationAnswers){
+		motivationMsg.textContent = "Please complete motivation setup in the pop up!";
+		return;
+	}
 
 
     if (!assignment.whyImportant) {
