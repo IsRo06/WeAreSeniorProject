@@ -2,6 +2,9 @@
 // CONSTANTS
 const domain = window.location.origin;
 let assignments = [];
+let toDoAssignments = [];
+let overdueAssignments = [];
+let completedAssignments = [];
 let motivationAnswers = {};
 
 const colorBg = "#094b80";
@@ -83,22 +86,31 @@ function hideTodo() {
 
 function organizeAssignments(assignments) {
     const now = new Date();
-    let toDoAssignments = [];
-    let overdueAssignments = [];
+    let toDo = [];
+    let overdue = [];
+    let completed = [];
 
     if (!Array.isArray(assignments)) assignments = [];
 
     for (let assignment of assignments) {
+        if (assignment.completed) {
+            completed.push(assignment);
+            continue;
+        }
         let dueDate = new Date(assignment.dueAt);
         if (dueDate < now) {
             console.log(assignment);
-            overdueAssignments.push(assignment);
+            overdue.push(assignment);
         } else {
-            toDoAssignments.push(assignment);
+            toDo.push(assignment);
         }
     }
 
-    return { toDoAssignments, overdueAssignments };
+    toDoAssignments = toDo;
+    overdueAssignments = overdue;
+    completedAssignments = completed;
+
+    console.log("Organized assignments: ", { toDoAssignments, overdueAssignments, completedAssignments });
 }
 
 // start the extension
@@ -128,6 +140,7 @@ function startExtension() {
     // Get assignments from storage or fetch from API if not available or outdated
     getAssignmentsFromStorageOrFetch(getPlannerItems).then((result) => {
         assignments = result;
+        organizeAssignments(assignments);
         console.log("Assignments ready for use: ", assignments);
         renderCanvasPets(document.querySelector("aside")); // move here
     });
@@ -147,7 +160,6 @@ async function getPlannerItems() {
         "/api/v1/planner/items" +
         `?start_date=${today}` +
         `&end_date=${future}` +
-        "&filter=incomplete_items" +
         "&per_page=100";
 
     try {
@@ -161,7 +173,7 @@ async function getPlannerItems() {
 
         // Filter for assignments only
         const rawAssignments = data.filter(
-            (item) => item.plannable_type === "assignment"
+            (item) => item.plannable_type === "assignment" || item.plannable_type === "quiz"
         );
 
         // Normalize the assignment data
@@ -177,19 +189,21 @@ async function getPlannerItems() {
 
 // Normalize assignments
 async function normalizeAssignment(item) {
+    console.log(item);
     return {
         id: item.plannable_id,
         title: item.plannable?.title || "Untitled",
         dueAt: item.plannable?.due_at || null,
         course: item.context_name || "No Course",
         whyImportant: null, // only generate if the user clicks on the assignment, to save API calls
-        completed: false,
+        completed: item.submissions.submitted,
     };
 }
 
 // get assignments from storage or fetch from API if not available or outdated
 async function getAssignmentsFromStorageOrFetch(
     getPlannerItems,
+    //fetchAgainTimer = 0
     fetchAgainTimer = 60 * 60 * 1000 // 1 hour
 ) {
     const { assignments: storedAssignments, updatedAt } =
@@ -422,6 +436,8 @@ function createPetImages() {
 }
 
 function createToDoList() {
+    motivationCheck();
+
     const parentDoc = document.createElement("div");
 
     const header = document.createElement("h3");
@@ -447,8 +463,6 @@ function createToDoList() {
 
     parentDoc.appendChild(header);
 
-    const { toDoAssignments } = organizeAssignments(assignments);
-
     toDoAssignments
         .filter((a) => isWithinNext7Days(a.dueAt))
         .forEach((a) => {
@@ -456,12 +470,23 @@ function createToDoList() {
             const title = document.createElement("div");
             const due = document.createElement("div");
 
-            title.textContent = a.title || "Untitled";
+            const courseText = document.createElement("span");
+            const assignmentText = document.createElement("span");
+
+            courseText.textContent = a.course.split("-")[0].trim() + ": ";
+            assignmentText.textContent = a.title || "Untitled";
+
+            assignmentText.style.fontSize = "12px"; 
+            assignmentText.style.opacity = "0.9";  
+
+            title.appendChild(courseText);
+            title.appendChild(assignmentText);
 
             const dueDate = new Date(a.dueAt);
             const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
             due.textContent = dueDateDisplay.slice(0, -5);
 
+            card.style.position = "relative";
             card.style.backgroundColor = colorBgDark;
             card.style.borderRadius = "5px";
             card.style.padding = "8px 10px";
@@ -473,11 +498,60 @@ function createToDoList() {
             card.style.display = "flex";
             card.style.justifyContent = "space-between";
             card.style.alignItems = "flex-start";
+
+            title.style.flex = "1";
+            title.style.marginRight = "10px"; 
+
+            due.style.whiteSpace = "nowrap";
+            due.style.alignSelf = "flex-start"; 
             card.style.cursor = "pointer";
 
             due.style.fontSize = "12px";
             due.style.opacity = "0.9";
 
+            const completeBtn = document.createElement("button");
+
+            completeBtn.textContent = "Mark Complete";
+
+            completeBtn.style.position = "absolute";
+            completeBtn.style.bottom = "6px";
+            completeBtn.style.right = "6px";
+
+            completeBtn.style.padding = "4px 8px";
+            completeBtn.style.fontSize = "10px";
+
+            completeBtn.style.border = "none";
+            completeBtn.style.borderRadius = "4px"; 
+
+            completeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+            completeBtn.style.color = "white";
+
+            completeBtn.style.cursor = "pointer";
+
+            completeBtn.addEventListener("mouseenter", () => {
+                completeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.35)";
+            });
+
+            completeBtn.addEventListener("mouseleave", () => {
+                completeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+            });
+
+            completeBtn.addEventListener("click", async (e) => {
+                e.stopPropagation();
+
+                console.log("CLICKED:", a.title, a.completed);
+
+                if (a.completed) return;
+
+                a.completed = true;
+
+                organizeAssignments(assignments);
+                await Storage.setAssignments(assignments);
+
+                card.remove();
+            });
+
+            card.appendChild(completeBtn);
             card.appendChild(title);
             card.appendChild(due);
             parentDoc.appendChild(card);
@@ -519,11 +593,58 @@ function isWithinNext7Days(dueDateStr) {
     return due >= now && due <= weekFromNow;
 }
 
+function motivationCheck() {
+    let curr = new Date();
+    let week = [];
+    let toDoAssignmentsCurrentWeek = [];
+    let completedAssignmentsCurrentWeek = [];
+
+    //console.log("CHECK MOOD:", { toDoAssignments, completedAssignments });
+
+    for (let i = 1; i <= 7; i++) {
+        let first = curr.getDate() - curr.getDay() + i;
+        let day = new Date(curr);
+        day.setDate(first);
+        day.setHours(0, 0, 0, 0);
+        week.push(day);
+    }
+
+    week[6].setHours(23, 59, 59, 999);
+
+    //console.log("WEEK:", week);
+
+    for (let a of toDoAssignments) {
+        let due = new Date(a.dueAt);
+
+        if (due >= week[0] && due <= week[6]) {
+            toDoAssignmentsCurrentWeek.push(a);
+        }
+    }
+
+    for (let a of completedAssignments) {
+        let due = new Date(a.dueAt);
+
+        if (due >= week[0] && due <= week[6]) {
+            completedAssignmentsCurrentWeek.push(a);
+        }
+    }
+
+    //console.log("CURRENT MOOD", toDoAssignmentsCurrentWeek, completedAssignmentsCurrentWeek);
+
+    let total = completedAssignmentsCurrentWeek.length + toDoAssignmentsCurrentWeek.length;
+
+    if (total === 0) return 0;
+
+    return (completedAssignmentsCurrentWeek.length / total) * 100;
+}
+
 function createPetStats() {
+    let moodPercent = motivationCheck();
+
     const parentDoc = document.createElement("div");
 
     const header = document.createElement("h3");
-    const moodStatBar = createStatBar("Mood", 85);
+    const moodStatBar = createStatBar("Mood", moodPercent);
     const wellbeingStatBar = createStatBar("Well-being", 40);
 
     parentDoc.style.backgroundColor = colorBg;
