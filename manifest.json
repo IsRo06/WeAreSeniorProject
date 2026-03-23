@@ -32,7 +32,8 @@
         "assets/*.gif",
         "Images/*.jpg",
         "Images/*.gif",
-        "Images/*.png"
+        "Images/*.png",
+        "Images/**.gif"
       ],
       "matches": ["<all_urls>"]
     }

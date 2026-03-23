@@ -15,31 +15,31 @@ const colorBarBg = "#ddd";
 const colorBarGreen = "#659B5E";
 
 let pet = {
-    mood: "happy",
-    wellbeing: "good",
+  mood: "happy",
+  wellbeing: "good",
 };
 
 // Storage helper to save and retrieve assignments from Chrome's local storage
 const Storage = {
-    async setAssignments(assignments) {
-        await chrome.storage.local.set({
-            assignments: assignments,
-            updatedAt: Date.now(),
-        });
+  async setAssignments(assignments) {
+    await chrome.storage.local.set({
+      assignments: assignments,
+      updatedAt: Date.now(),
+    });
 
-        console.log("Assignments saved to storage");
-    },
+    console.log("Assignments saved to storage");
+  },
 
-    async getAssignments() {
-        const { assignments, updatedAt } = await chrome.storage.local.get([
-            "assignments",
-            "updatedAt",
-        ]);
+  async getAssignments() {
+    const { assignments, updatedAt } = await chrome.storage.local.get([
+      "assignments",
+      "updatedAt",
+    ]);
 
-        console.log("Retrieving assignments from storage: ", assignments);
+    console.log("Retrieving assignments from storage: ", assignments);
 
-        return { assignments, updatedAt };
-    },
+    return { assignments, updatedAt };
+  },
 };
 
 let animalType = "cat1";
@@ -47,248 +47,272 @@ let animalType = "cat1";
 console.log("Canvas Pet content.js loaded");
 
 chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === "local" && changes.selectedPet) {
-        const newValue = changes.selectedPet.newValue;
-        animalType = newValue;
-        console.log("Animal Type: " + animalType);
+  if (area === "local" && changes.selectedPet) {
+    const newValue = changes.selectedPet.newValue;
+    animalType = newValue;
+    console.log("Animal Type: " + animalType);
 
-        const petImg = document.getElementById("petImg");
-        const moodToggle = document.getElementById("moodToggle");
+    const petImg = document.getElementById("petImg");
+    const moodToggle = document.getElementById("moodToggle");
 
-        if (petImg && moodToggle) {
-            updatePet(moodToggle, petImg);
-        }
+    if (petImg && moodToggle) {
+      updatePet(moodToggle, petImg);
     }
+  }
 
-    // listen for changes to motivation answers to update the context for the LLM and the pet's motivational messages
-    if (area === "local" && changes.motivationAnswers) {
-        motivationAnswers = changes.motivationAnswers.newValue;
-        console.log("Motivation answers updated:", motivationAnswers);
-    }
+  // listen for changes to motivation answers to update the context for the LLM and the pet's motivational messages
+  if (area === "local" && changes.motivationAnswers) {
+    motivationAnswers = changes.motivationAnswers.newValue;
+    console.log("Motivation answers updated:", motivationAnswers);
+  }
 });
 
 isDomainCanvas();
 
 function isDomainCanvas() {
-    if (location.hostname.includes("instructure.com")) {
-        startExtension();
-    }
+  if (location.hostname.includes("instructure.com")) {
+    startExtension();
+  }
 }
 
 function hideTodo() {
-    const style = document.createElement("style");
-    style.id = "hide-canvas-todo";
-    style.textContent = `
+  const style = document.createElement("style");
+  style.id = "hide-canvas-todo";
+  style.textContent = `
     #right-side { display: none !important; }
   `;
-    document.head.appendChild(style);
+  document.head.appendChild(style);
 }
 
 function organizeAssignments(assignments) {
-    const now = new Date();
-    let toDo = [];
-    let overdue = [];
-    let completed = [];
+  const now = new Date();
+  let toDo = [];
+  let overdue = [];
+  let completed = [];
 
-    if (!Array.isArray(assignments)) assignments = [];
+  if (!Array.isArray(assignments)) assignments = [];
 
-    for (let assignment of assignments) {
-        if (assignment.completed) {
-            completed.push(assignment);
-            continue;
-        }
-        let dueDate = new Date(assignment.dueAt);
-        if (dueDate < now) {
-            console.log(assignment);
-            overdue.push(assignment);
-        } else {
-            toDo.push(assignment);
-        }
+  for (let assignment of assignments) {
+    if (assignment.completed) {
+      completed.push(assignment);
+      continue;
     }
+    let dueDate = new Date(assignment.dueAt);
+    if (dueDate < now) {
+      console.log(assignment);
+      overdue.push(assignment);
+    } else {
+      toDo.push(assignment);
+    }
+  }
 
-    toDoAssignments = toDo;
-    overdueAssignments = overdue;
-    completedAssignments = completed;
+  toDoAssignments = toDo;
+  overdueAssignments = overdue;
+  completedAssignments = completed;
 
-    console.log("Organized assignments: ", { toDoAssignments, overdueAssignments, completedAssignments });
+  console.log("Organized assignments: ", {
+    toDoAssignments,
+    overdueAssignments,
+    completedAssignments,
+  });
 }
 
 // start the extension
 function startExtension() {
-    console.log("This is Canvas! Incoming Pets!");
-    console.log("Page title: ", document.title);
+  console.log("This is Canvas! Incoming Pets!");
+  console.log("Page title: ", document.title);
 
-    hideTodo();
+  hideTodo();
 
-    chrome.storage.local.get(["selectedPet"], (result) => {
-        if (result.selectedPet) {
-            animalType = result.selectedPet;
-            console.log("Loaded selected pet:", animalType);
-        }
-    });
+  chrome.storage.local.get(["selectedPet"], (result) => {
+    if (result.selectedPet) {
+      animalType = result.selectedPet;
+      console.log("Loaded selected pet:", animalType);
+    }
+  });
 
-    chrome.storage.local.get(["pet"], (result) => {
-        if (result.pet) {
-            pet = result.pet;
-        }
-    });
+  chrome.storage.local.get(["pet"], (result) => {
+    if (result.pet) {
+      pet = result.pet;
+    }
+  });
 
-    chrome.storage.local.get(["motivationAnswers"], (result) => {
-        console.log("Motivation answers on load:", result.motivationAnswers);
-        motivationAnswers = result.motivationAnswers || null;
-    });
-    // Get assignments from storage or fetch from API if not available or outdated
-    getAssignmentsFromStorageOrFetch(getPlannerItems).then((result) => {
-        assignments = result;
-        organizeAssignments(assignments);
-        console.log("Assignments ready for use: ", assignments);
-        renderCanvasPets(document.querySelector("aside")); // move here
-    });
+  chrome.storage.local.get(["motivationAnswers"], (result) => {
+    console.log("Motivation answers on load:", result.motivationAnswers);
+    motivationAnswers = result.motivationAnswers || null;
+  });
+  // Get assignments from storage or fetch from API if not available or outdated
+  getAssignmentsFromStorageOrFetch(getPlannerItems).then((result) => {
+    assignments = result;
+    organizeAssignments(assignments);
+    console.log("Assignments ready for use: ", assignments);
+    renderCanvasPets(document.querySelector("aside")); // move here
+  });
 }
 
 async function getPlannerItems() {
-    // API endpoint to get planner items for a specific date range
-    // filtering for incomplete items
-    // limiting to 100 results per page
-    const today = new Date().toISOString().split("T")[0];
-    const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-        .toISOString()
-        .split("T")[0];
+  // API endpoint to get planner items for a specific date range
+  // filtering for incomplete items
+  // limiting to 100 results per page
+  const today = new Date().toISOString().split("T")[0];
+  const future = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split("T")[0];
 
-    const url =
-        domain +
-        "/api/v1/planner/items" +
-        `?start_date=${today}` +
-        `&end_date=${future}` +
-        "&per_page=100";
+  const url =
+    domain +
+    "/api/v1/planner/items" +
+    `?start_date=${today}` +
+    `&end_date=${future}` +
+    "&per_page=100";
 
-    try {
-        let response = await fetch(url);
+  try {
+    let response = await fetch(url);
 
-        if (!response.ok) {
-            throw new Error("Network response was not ok: " + response.statusText);
-        }
-
-        const data = await response.json();
-
-        // Filter for assignments only
-        const rawAssignments = data.filter(
-            (item) => item.plannable_type === "assignment" || item.plannable_type === "quiz"
-        );
-
-        // Normalize the assignment data
-        assignments = await Promise.all(rawAssignments.map(normalizeAssignment));
-
-        console.log("Fetched and normalized assignments: ", assignments);
-
-        return assignments;
-    } catch (error) {
-        console.error("Error fetching planner items:", error);
+    if (!response.ok) {
+      throw new Error("Network response was not ok: " + response.statusText);
     }
+
+    const data = await response.json();
+
+    // Filter for assignments only
+    const rawAssignments = data.filter(
+      (item) =>
+        item.plannable_type === "assignment" || item.plannable_type === "quiz"
+    );
+
+    // Normalize the assignment data
+    assignments = await Promise.all(rawAssignments.map(normalizeAssignment));
+
+    console.log("Fetched and normalized assignments: ", assignments);
+
+    return assignments;
+  } catch (error) {
+    console.error("Error fetching planner items:", error);
+  }
 }
 
 // Normalize assignments
 async function normalizeAssignment(item) {
-    console.log(item);
-    return {
-        id: item.plannable_id,
-        title: item.plannable?.title || "Untitled",
-        dueAt: item.plannable?.due_at || null,
-        course: item.context_name || "No Course",
-        whyImportant: null, // only generate if the user clicks on the assignment, to save API calls
-        completed: item.submissions.submitted,
-    };
+  console.log(item);
+  return {
+    id: item.plannable_id,
+    title: item.plannable?.title || "Untitled",
+    dueAt: item.plannable?.due_at || null,
+    course: item.context_name || "No Course",
+    whyImportant: null, // only generate if the user clicks on the assignment, to save API calls
+    completed: item.submissions.submitted,
+  };
 }
 
 // get assignments from storage or fetch from API if not available or outdated
 async function getAssignmentsFromStorageOrFetch(
-    getPlannerItems,
-    //fetchAgainTimer = 0
-    fetchAgainTimer = 60 * 60 * 1000 // 1 hour
+  getPlannerItems,
+  //fetchAgainTimer = 0
+  fetchAgainTimer = 60 * 60 * 1000 // 1 hour
 ) {
-    const { assignments: storedAssignments, updatedAt } =
-        await Storage.getAssignments();
+  const { assignments: storedAssignments, updatedAt } =
+    await Storage.getAssignments();
 
-    // check if we need to fetch new assignments based on the last updated time and the defined timer
-    if (
-        storedAssignments &&
-        updatedAt &&
-        storedAssignments.length > 0 &&
-        Date.now() - updatedAt < fetchAgainTimer
-    ) {
-        console.log("Using cached assignments from storage");
-        assignments = storedAssignments;
-    } else {
-        console.log("No valid cached assignments found, fetching from API");
-        await getPlannerItems();
-        await Storage.setAssignments(assignments);
-    }
+  // check if we need to fetch new assignments based on the last updated time and the defined timer
+  if (
+    storedAssignments &&
+    updatedAt &&
+    storedAssignments.length > 0 &&
+    Date.now() - updatedAt < fetchAgainTimer
+  ) {
+    console.log("Using cached assignments from storage");
+    assignments = storedAssignments;
+  } else {
+    console.log("No valid cached assignments found, fetching from API");
+    await getPlannerItems();
+    await Storage.setAssignments(assignments);
+  }
 
-    return assignments;
+  return assignments;
 }
 
 function getAnimalPaths() {
-    return {
-        cat1: {
-            normal: chrome.runtime.getURL("/Images/Cat/CatWagTail.gif"),
-            happy: chrome.runtime.getURL("/Images/Cat/CatHappy.gif"),
-            hungry: chrome.runtime.getURL("/Images/Cat/CatHungry.gif"),
-            eating: chrome.runtime.getURL("/Images/Cat/CatEating.gif"),
-        },
-        cat2: {
-            normal: chrome.runtime.getURL("/Images/Cat/Cat2Wag.gif"),
-            happy: chrome.runtime.getURL("/Images/Cat/Cat2Happy.gif"),
-            hungry: chrome.runtime.getURL("/Images/Cat/Cat2Hungry.gif"),
-            eating: chrome.runtime.getURL("/Images/Cat/Cat2Eating.gif"),
-        },
-        cat3: {
-            normal: chrome.runtime.getURL("/Images/Cat/Cat3Wag.gif"),
-            happy: chrome.runtime.getURL("/Images/Cat/Cat3Happy.gif"),
-            hungry: chrome.runtime.getURL("/Images/Cat/Cat3Hungry.gif"),
-            eating: chrome.runtime.getURL("/Images/Cat/Cat3Eating.gif"),
-        },
-        dog1: {
-            normal: chrome.runtime.getURL("/Images/Dog/DogTailWag.gif"),
-            happy: chrome.runtime.getURL("/Images/Dog/Happy Dog.gif"),
-            hungry: chrome.runtime.getURL("/Images/Dog/DogHungry.gif"),
-            eating: chrome.runtime.getURL("/Images/Dog/DogEating.gif"),
-        },
-        dog2: {
-            normal: chrome.runtime.getURL("/Images/Dog/Dog2Wag.gif"),
-            happy: chrome.runtime.getURL("/Images/Dog/Dog2Happy.gif"),
-            hungry: chrome.runtime.getURL("/Images/Dog/Dog2Hungry.gif"),
-            eating: chrome.runtime.getURL("/Images/Dog/Dog2Eating.gif"),
-        },
-        dog3: {
-            normal: chrome.runtime.getURL("/Images/Dog/Dog3Wag.gif"),
-            happy: chrome.runtime.getURL("/Images/Dog/Dog3Happy.gif"),
-            hungry: chrome.runtime.getURL("/Images/Dog/Dog3Hungry.gif"),
-            eating: chrome.runtime.getURL("/Images/Dog/Dog3Eating.gif"),
-        },
-    };
+  return {
+    cat1: {
+      normal: chrome.runtime.getURL("/Images/Cat/Cat1Wag.gif"),
+      happy: chrome.runtime.getURL("/Images/Cat/Cat1Happy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Cat/Cat1Hungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Cat/Cat1Eating.gif"),
+    },
+    cat2: {
+      normal: chrome.runtime.getURL("/Images/Cat/Cat2Wag.gif"),
+      happy: chrome.runtime.getURL("/Images/Cat/Cat2Happy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Cat/Cat2Hungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Cat/Cat2Eating.gif"),
+    },
+    cat3: {
+      normal: chrome.runtime.getURL("/Images/Cat/Cat3Wag.gif"),
+      happy: chrome.runtime.getURL("/Images/Cat/Cat3Happy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Cat/Cat3Hungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Cat/Cat3Eating.gif"),
+    },
+    dog1: {
+      normal: chrome.runtime.getURL("/Images/Dog/Dog1Wag.gif"),
+      happy: chrome.runtime.getURL("/Images/Dog/Dog1Happy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Dog/Dog1Hungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Dog/Dog1Eating.gif"),
+    },
+    dog2: {
+      normal: chrome.runtime.getURL("/Images/Dog/Dog2Wag.gif"),
+      happy: chrome.runtime.getURL("/Images/Dog/Dog2Happy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Dog/Dog2Hungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Dog/Dog2Eating.gif"),
+    },
+    dog3: {
+      normal: chrome.runtime.getURL("/Images/Dog/Dog3Wag.gif"),
+      happy: chrome.runtime.getURL("/Images/Dog/Dog3Happy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Dog/Dog3Hungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Dog/Dog3Eating.gif"),
+    },
+  };
+}
+
+function playCompleteSequence(duration = 2000) {
+  const petImg = document.getElementById("petImg");
+  if (!petImg) return;
+
+  const animal = animalType || "cat1";
+  const paths = getAnimalPaths()[animal];
+  if (!paths) return;
+
+  petImg.src = paths.eating;
+
+  setTimeout(() => {
+    petImg.src = paths.happy;
+
+    setTimeout(() => {
+      petImg.src = overdueAssignments.length > 0 ? paths.hungry : paths.normal;
+    }, duration);
+  }, duration);
 }
 
 function renderCanvasPets(element) {
-    if (!element) {
-        return;
-    }
+  if (!element) {
+    return;
+  }
 
-    const canvasPets = document.createElement("div");
-    const title = document.createElement("h2");
+  const canvasPets = document.createElement("div");
+  const title = document.createElement("h2");
 
-    const petImages = createPetImages();
-    const petStats = createPetStats();
-    const toDoList = createToDoList();
+  const petImages = createPetImages();
+  const petStats = createPetStats();
+  const toDoList = createToDoList();
 
-    title.textContent = "Welcome to Canvas Pets!";
-    title.style.textAlign = "center";
+  title.textContent = "Welcome to Canvas Pets!";
+  title.style.textAlign = "center";
 
-    canvasPets.appendChild(title);
-    canvasPets.appendChild(petImages);
-    canvasPets.appendChild(petStats);
-    canvasPets.appendChild(toDoList);
+  canvasPets.appendChild(title);
+  canvasPets.appendChild(petImages);
+  canvasPets.appendChild(petStats);
+  canvasPets.appendChild(toDoList);
 
-    element.insertAdjacentElement("beforebegin", canvasPets);
+  element.insertAdjacentElement("beforebegin", canvasPets);
 }
 
 function createPetImages() {
@@ -311,11 +335,11 @@ function createPetImages() {
   const moodToggleLabel = document.createElement("label");
   const moodToggleCheck = document.createElement("input");
 
-  if(motivationAnswers){
-	  motivationMsg.textContent = "You can do it!";
-  }
-	else{
-	  motivationMsg.textContent = "Please set up Canvas Pets with your motivations in the pop up!";
+  if (motivationAnswers) {
+    motivationMsg.textContent = "You can do it!";
+  } else {
+    motivationMsg.textContent =
+      "Please set up Canvas Pets with your motivations in the pop up!";
   }
 
   motivationMsg.id = "pet-motivation-msg";
@@ -388,13 +412,12 @@ function createPetImages() {
   });
 
   petMotivateBtn.addEventListener("click", () => {
-	if(!motivationAnswers){
-	  motivationMsg.textContent = "Please complete the motivation setup!";
-	}
-	else{
+    if (!motivationAnswers) {
+      motivationMsg.textContent = "Please complete the motivation setup!";
+    } else {
       motivationMsg.textContent = "Thinking...";
       PromptLLM(motivationMsg);
-	}
+    }
   });
 
   const petRow = document.createElement("div");
@@ -436,388 +459,411 @@ function createPetImages() {
 }
 
 function createToDoList() {
-    motivationCheck();
+  motivationCheck();
 
-    const parentDoc = document.createElement("div");
+  const parentDoc = document.createElement("div");
 
-    const header = document.createElement("h3");
+  const header = document.createElement("h3");
 
-    parentDoc.style.backgroundColor = colorBg;
-    parentDoc.style.borderRadius = "5px";
-    parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
-    parentDoc.style.paddingTop = "12px";
-    parentDoc.style.paddingLeft = "12px";
-    parentDoc.style.paddingRight = "12px";
-    parentDoc.style.paddingBottom = "200px";
-    parentDoc.style.margin = "10px";
+  parentDoc.style.backgroundColor = colorBg;
+  parentDoc.style.borderRadius = "5px";
+  parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+  parentDoc.style.paddingTop = "12px";
+  parentDoc.style.paddingLeft = "12px";
+  parentDoc.style.paddingRight = "12px";
+  parentDoc.style.paddingBottom = "200px";
+  parentDoc.style.margin = "10px";
 
-    parentDoc.style.display = "flex";
-    parentDoc.style.flexDirection = "column";
-    parentDoc.style.alignItems = "center";
-    parentDoc.style.justifyContent = "flex-start";
+  parentDoc.style.display = "flex";
+  parentDoc.style.flexDirection = "column";
+  parentDoc.style.alignItems = "center";
+  parentDoc.style.justifyContent = "flex-start";
 
-    header.textContent = "Upcoming Assignments";
-    header.style.textAlign = "center";
-    header.style.margin = "0";
-    header.style.color = "white";
+  header.textContent = "Upcoming Assignments";
+  header.style.textAlign = "center";
+  header.style.margin = "0";
+  header.style.color = "white";
 
-    parentDoc.appendChild(header);
+  parentDoc.appendChild(header);
 
-    toDoAssignments
-        .filter((a) => isWithinNext7Days(a.dueAt))
-        .forEach((a) => {
-            const card = document.createElement("div");
-            const title = document.createElement("div");
-            const due = document.createElement("div");
+  toDoAssignments
+    .filter((a) => isWithinNext7Days(a.dueAt))
+    .forEach((a) => {
+      const card = document.createElement("div");
+      const title = document.createElement("div");
+      const due = document.createElement("div");
 
-            const courseText = document.createElement("span");
-            const assignmentText = document.createElement("span");
+      const courseText = document.createElement("span");
+      const assignmentText = document.createElement("span");
 
-            courseText.textContent = a.course.split("-")[0].trim() + ": ";
-            assignmentText.textContent = a.title || "Untitled";
+      courseText.textContent = a.course.split("-")[0].trim() + ": ";
+      assignmentText.textContent = a.title || "Untitled";
 
-            assignmentText.style.fontSize = "12px"; 
-            assignmentText.style.opacity = "0.9";  
+      assignmentText.style.fontSize = "12px";
+      assignmentText.style.opacity = "0.9";
 
-            title.appendChild(courseText);
-            title.appendChild(assignmentText);
+      title.appendChild(courseText);
+      title.appendChild(assignmentText);
 
-            const dueDate = new Date(a.dueAt);
-            const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
-            due.textContent = dueDateDisplay.slice(0, -5);
+      const dueDate = new Date(a.dueAt);
+      const dueDateDisplay = "Due: " + dueDate.toLocaleDateString();
+      due.textContent = dueDateDisplay.slice(0, -5);
 
-            card.style.position = "relative";
-            card.style.backgroundColor = colorBgDark;
-            card.style.borderRadius = "5px";
-            card.style.padding = "8px 10px";
-            card.style.marginTop = "8px";
-            card.style.width = "100%";
-            card.style.color = "white";
-            card.style.boxSizing = "border-box";
+      card.style.position = "relative";
+      card.style.backgroundColor = colorBgDark;
+      card.style.borderRadius = "5px";
+      card.style.padding = "8px 10px";
+      card.style.marginTop = "8px";
+      card.style.width = "100%";
+      card.style.color = "white";
+      card.style.boxSizing = "border-box";
 
-            card.style.display = "flex";
-            card.style.justifyContent = "space-between";
-            card.style.alignItems = "flex-start";
+      card.style.display = "flex";
+      card.style.justifyContent = "space-between";
+      card.style.alignItems = "flex-start";
 
-            title.style.flex = "1";
-            title.style.marginRight = "10px"; 
+      title.style.flex = "1";
+      title.style.marginRight = "10px";
 
-            due.style.whiteSpace = "nowrap";
-            due.style.alignSelf = "flex-start"; 
-            card.style.cursor = "pointer";
+      due.style.whiteSpace = "nowrap";
+      due.style.alignSelf = "flex-start";
+      card.style.cursor = "pointer";
 
-            due.style.fontSize = "12px";
-            due.style.opacity = "0.9";
+      due.style.fontSize = "12px";
+      due.style.opacity = "0.9";
 
-            const completeBtn = document.createElement("button");
+      const completeBtn = document.createElement("button");
 
-            completeBtn.textContent = "Mark Complete";
+      completeBtn.textContent = "Mark Complete";
 
-            completeBtn.style.position = "absolute";
-            completeBtn.style.bottom = "6px";
-            completeBtn.style.right = "6px";
+      completeBtn.style.position = "absolute";
+      completeBtn.style.bottom = "6px";
+      completeBtn.style.right = "6px";
 
-            completeBtn.style.padding = "4px 8px";
-            completeBtn.style.fontSize = "10px";
+      completeBtn.style.padding = "4px 8px";
+      completeBtn.style.fontSize = "10px";
 
-            completeBtn.style.border = "none";
-            completeBtn.style.borderRadius = "4px"; 
+      completeBtn.style.border = "none";
+      completeBtn.style.borderRadius = "4px";
 
-            completeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
-            completeBtn.style.color = "white";
+      completeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+      completeBtn.style.color = "white";
 
-            completeBtn.style.cursor = "pointer";
+      completeBtn.style.cursor = "pointer";
 
-            completeBtn.addEventListener("mouseenter", () => {
-                completeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.35)";
-            });
+      completeBtn.addEventListener("mouseenter", () => {
+        completeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.35)";
+      });
 
-            completeBtn.addEventListener("mouseleave", () => {
-                completeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
-            });
+      completeBtn.addEventListener("mouseleave", () => {
+        completeBtn.style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+      });
 
-            completeBtn.addEventListener("click", async (e) => {
-                e.stopPropagation();
+      completeBtn.addEventListener("click", async (e) => {
+        e.stopPropagation();
 
-                console.log("CLICKED:", a.title, a.completed);
+        console.log("CLICKED:", a.title, a.completed);
 
-                if (a.completed) return;
+        if (a.completed) return;
 
-                a.completed = true;
+        a.completed = true;
 
-                organizeAssignments(assignments);
-                await Storage.setAssignments(assignments);
+        organizeAssignments(assignments);
+        await Storage.setAssignments(assignments);
 
-                card.remove();
-            });
+        card.remove();
 
-            card.appendChild(completeBtn);
-            card.appendChild(title);
-            card.appendChild(due);
-            parentDoc.appendChild(card);
+        playCompleteSequence(2000);
+      });
 
-            card.addEventListener("click", async () => {
-                await handleAssignmentClick(a.id);
-            });
-        });
+      card.appendChild(completeBtn);
+      card.appendChild(title);
+      card.appendChild(due);
+      parentDoc.appendChild(card);
 
-    return parentDoc;
+      card.addEventListener("click", async () => {
+        await handleAssignmentClick(a.id);
+      });
+    });
+
+  return parentDoc;
 }
 
-// handle click on assignment
 async function handleAssignmentClick(id) {
-    const assignment = assignments.find((a) => a.id === id);
-    const motivationMsg = document.getElementById("pet-motivation-msg");
-    motivationMsg.textContent = "Thinking...";
+  const assignment = assignments.find((a) => a.id === id);
+  const motivationMsg = document.getElementById("pet-motivation-msg");
+  motivationMsg.textContent = "Thinking...";
 
-	if(!motivationAnswers){
-		motivationMsg.textContent = "Please complete motivation setup in the pop up!";
-		return;
-	}
+  if (!motivationAnswers) {
+    motivationMsg.textContent =
+      "Please complete motivation setup in the pop up!";
+    return;
+  }
 
+  if (!assignment.whyImportant) {
+    assignment.whyImportant = await determineWhyImportant(assignment);
+    await Storage.setAssignments(assignments);
+  }
 
-    if (!assignment.whyImportant) {
-        assignment.whyImportant = await determineWhyImportant(assignment);
-        await Storage.setAssignments(assignments);
-    }
-
-    // diplay the importance of the assignment as the pet's message
-    displayMotivation(assignment.whyImportant, motivationMsg);
+  // diplay the importance of the assignment as the pet's message
+  displayMotivation(assignment.whyImportant, motivationMsg);
 }
 
 function isWithinNext7Days(dueDateStr) {
-    const now = new Date();
-    const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-    const due = new Date(dueDateStr);
+  const now = new Date();
+  const weekFromNow = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const due = new Date(dueDateStr);
 
-    return due >= now && due <= weekFromNow;
+  return due >= now && due <= weekFromNow;
 }
 
 function motivationCheck() {
-    let curr = new Date();
-    let week = [];
-    let toDoAssignmentsCurrentWeek = [];
-    let completedAssignmentsCurrentWeek = [];
+  let curr = new Date();
+  let week = [];
+  let toDoAssignmentsCurrentWeek = [];
+  let completedAssignmentsCurrentWeek = [];
 
-    //console.log("CHECK MOOD:", { toDoAssignments, completedAssignments });
+  //console.log("CHECK MOOD:", { toDoAssignments, completedAssignments });
 
-    for (let i = 1; i <= 7; i++) {
-        let first = curr.getDate() - curr.getDay() + i;
-        let day = new Date(curr);
-        day.setDate(first);
-        day.setHours(0, 0, 0, 0);
-        week.push(day);
+  for (let i = 1; i <= 7; i++) {
+    let first = curr.getDate() - curr.getDay() + i;
+    let day = new Date(curr);
+    day.setDate(first);
+    day.setHours(0, 0, 0, 0);
+    week.push(day);
+  }
+
+  week[6].setHours(23, 59, 59, 999);
+
+  //console.log("WEEK:", week);
+
+  for (let a of toDoAssignments) {
+    let due = new Date(a.dueAt);
+
+    if (due >= week[0] && due <= week[6]) {
+      toDoAssignmentsCurrentWeek.push(a);
     }
+  }
 
-    week[6].setHours(23, 59, 59, 999);
+  for (let a of completedAssignments) {
+    let due = new Date(a.dueAt);
 
-    //console.log("WEEK:", week);
-
-    for (let a of toDoAssignments) {
-        let due = new Date(a.dueAt);
-
-        if (due >= week[0] && due <= week[6]) {
-            toDoAssignmentsCurrentWeek.push(a);
-        }
+    if (due >= week[0] && due <= week[6]) {
+      completedAssignmentsCurrentWeek.push(a);
     }
+  }
 
-    for (let a of completedAssignments) {
-        let due = new Date(a.dueAt);
+  //console.log("CURRENT MOOD", toDoAssignmentsCurrentWeek, completedAssignmentsCurrentWeek);
 
-        if (due >= week[0] && due <= week[6]) {
-            completedAssignmentsCurrentWeek.push(a);
-        }
-    }
+  let total =
+    completedAssignmentsCurrentWeek.length + toDoAssignmentsCurrentWeek.length;
 
-    //console.log("CURRENT MOOD", toDoAssignmentsCurrentWeek, completedAssignmentsCurrentWeek);
+  if (total === 0) return 0;
 
-    let total = completedAssignmentsCurrentWeek.length + toDoAssignmentsCurrentWeek.length;
-
-    if (total === 0) return 0;
-
-    return (completedAssignmentsCurrentWeek.length / total) * 100;
+  return (completedAssignmentsCurrentWeek.length / total) * 100;
 }
 
 function createPetStats() {
-    let moodPercent = motivationCheck();
+  let moodPercent = motivationCheck();
 
-    const parentDoc = document.createElement("div");
+  const parentDoc = document.createElement("div");
 
-    const header = document.createElement("h3");
-    const moodStatBar = createStatBar("Mood", moodPercent);
-    const wellbeingStatBar = createStatBar("Well-being", 40);
+  const header = document.createElement("h3");
+  const moodStatBar = createStatBar("Mood", moodPercent);
+  const wellbeingStatBar = createStatBar("Well-being", 40);
 
-    parentDoc.style.backgroundColor = colorBg;
-    parentDoc.style.borderRadius = "5px";
-    parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
-    parentDoc.style.padding = "5px";
-    parentDoc.style.margin = "10px";
+  parentDoc.style.backgroundColor = colorBg;
+  parentDoc.style.borderRadius = "5px";
+  parentDoc.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.3)";
+  parentDoc.style.padding = "5px";
+  parentDoc.style.margin = "10px";
 
-    header.textContent = "Pet Stats";
-    header.style.textAlign = "center";
-    header.style.padding = "0px";
-    header.style.color = "white";
+  header.textContent = "Pet Stats";
+  header.style.textAlign = "center";
+  header.style.padding = "0px";
+  header.style.color = "white";
 
-    parentDoc.appendChild(header);
-    parentDoc.appendChild(moodStatBar);
-    parentDoc.appendChild(wellbeingStatBar);
+  parentDoc.appendChild(header);
+  parentDoc.appendChild(moodStatBar);
+  parentDoc.appendChild(wellbeingStatBar);
 
-    return parentDoc;
+  return parentDoc;
 }
 
 function createStatBar(label, percent) {
-    const statBar = document.createElement("div");
-    const statLabel = document.createElement("p");
-    const bar = document.createElement("div");
-    const barBg = document.createElement("div");
-    const barFill = document.createElement("div");
-    const percentNum = document.createElement("p");
+  const statBar = document.createElement("div");
+  const statLabel = document.createElement("p");
+  const bar = document.createElement("div");
+  const barBg = document.createElement("div");
+  const barFill = document.createElement("div");
+  const percentNum = document.createElement("p");
 
-    statBar.style.padding = "0 5px 0 5px";
+  statBar.style.padding = "0 5px 0 5px";
 
-    statLabel.textContent = label;
-    percentNum.textContent = percent + "%";
+  statLabel.textContent = label;
+  percentNum.textContent = percent + "%";
 
-    statLabel.style.textAlign = "center";
-    statLabel.style.fontWeight = "bold";
-    statLabel.style.padding = "0px";
-    statLabel.style.margin = "0px";
-    statLabel.style.color = "white";
+  statLabel.style.textAlign = "center";
+  statLabel.style.fontWeight = "bold";
+  statLabel.style.padding = "0px";
+  statLabel.style.margin = "0px";
+  statLabel.style.color = "white";
 
-    percentNum.style.color = "white";
+  percentNum.style.color = "white";
 
-    bar.style.display = "flex";
-    bar.style.width = "auto";
-    bar.style.flexDirection = "row";
-    bar.style.alignItems = "center";
-    bar.style.padding = "0px";
-    bar.style.gap = "5px";
-    bar.style.margin = "0px";
+  bar.style.display = "flex";
+  bar.style.width = "auto";
+  bar.style.flexDirection = "row";
+  bar.style.alignItems = "center";
+  bar.style.padding = "0px";
+  bar.style.gap = "5px";
+  bar.style.margin = "0px";
 
-    barBg.style.backgroundColor = colorBarBg;
-    barBg.style.height = "20px";
-    barBg.style.width = "100%";
-    barBg.style.display = "flex";
-    barBg.style.alignItems = "center";
-    barBg.style.borderRadius = "10px";
+  barBg.style.backgroundColor = colorBarBg;
+  barBg.style.height = "20px";
+  barBg.style.width = "100%";
+  barBg.style.display = "flex";
+  barBg.style.alignItems = "center";
+  barBg.style.borderRadius = "10px";
 
-    barFill.style.backgroundColor = colorBarGreen;
-    barFill.style.height = "100%";
-    barFill.style.width = percent + "%";
-    barFill.style.borderRadius = "10px";
+  barFill.style.backgroundColor = colorBarGreen;
+  barFill.style.height = "100%";
+  barFill.style.width = percent + "%";
+  barFill.style.borderRadius = "10px";
 
-    statBar.appendChild(statLabel);
-    statBar.appendChild(bar);
-    bar.appendChild(barBg);
-    barBg.appendChild(barFill);
-    bar.appendChild(percentNum);
-    return statBar;
+  statBar.appendChild(statLabel);
+  statBar.appendChild(bar);
+  bar.appendChild(barBg);
+  barBg.appendChild(barFill);
+  bar.appendChild(percentNum);
+  return statBar;
 }
 
+// Sets the pet's idle animation. Defaults to hungry if there are overdue assignments,
+// otherwise uses the normal wag. The happy mood toggle overrides both.
 function updatePet(moodToggle, imageElement) {
-    const animal = animalType || "cat1";
-    const mood = moodToggle.checked ? "happy" : "normal";
+  const animal = animalType || "cat1";
+  const paths = getAnimalPaths();
 
-    const paths = getAnimalPaths();
+  if (!paths[animal]) {
+    console.log("Missing pet paths for:", animal);
+    return;
+  }
 
-    if (!paths[animal] || !paths[animal][mood]) {
-        console.log("Missing pet path for:", animal, mood);
-        return;
-    }
+  let mood;
+  if (moodToggle.checked) {
+    mood = "happy";
+  } else if (overdueAssignments.length > 0) {
+    mood = "hungry";
+  } else {
+    mood = "normal";
+  }
 
-    console.log("Updating pet to:", animal, mood, paths[animal][mood]);
-    imageElement.src = paths[animal][mood];
+  if (!paths[animal][mood]) {
+    console.log("Missing pet path for:", animal, mood);
+    return;
+  }
+
+  console.log("Updating pet to:", animal, mood, paths[animal][mood]);
+  imageElement.src = paths[animal][mood];
 }
 
 function getMotivationContext() {
-    console.log("getMotivationContext called, motivationAnswers:", motivationAnswers);
-    if (!motivationAnswers) return "";
+  console.log(
+    "getMotivationContext called, motivationAnswers:",
+    motivationAnswers
+  );
+  if (!motivationAnswers) return "";
 
-    // summary of questionnaire answers to provide context to the LLM for generating motivation messages
-    const summary = motivationAnswers
-        .filter((a) => a.answer !== null)
-        .map((a) => `${a.question}: ${a.answer}/5`)
-        .join("\n");
+  // summary of questionnaire answers to provide context to the LLM for generating motivation messages
+  const summary = motivationAnswers
+    .filter((a) => a.answer !== null)
+    .map((a) => `${a.question}: ${a.answer}/5`)
+    .join("\n");
 
-    console.log("Motivation questionnaire summary for LLM context: ", summary);
+  console.log("Motivation questionnaire summary for LLM context: ", summary);
 
-    return `\n\nThe student answered a motivation questionnaire (1=disagree, 5=agree):\n${summary}\nAnalyze and mention" these to encourage the student and make the motivation message more personalized.`;
+  return `\n\nThe student answered a motivation questionnaire (1=disagree, 5=agree):\n${summary}\nAnalyze and mention" these to encourage the student and make the motivation message more personalized.`;
 }
 
 //LLM stuff
 async function GetMotivation() {
-    try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
             {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
+              parts: [
+                {
+                  text:
+                    "You are an encouraging virtual pet. Give a short 1-2 sentence motivational message to a student who is behind on their assignments. Respond in an undergraduate student's tone" +
+                    getMotivationContext(),
                 },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [
-                                {
-                                    text: "You are an encouraging virtual pet. Give a short 1-2 sentence motivational message to a student who is behind on their assignments. Respond in an undergraduate student's tone" + getMotivationContext(),
-                                },
-                            ],
-                        },
-                    ],
-                }),
-            }
-        );
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
-        const data = await response.json();
-        console.log("Gemini response:", data);
-        return data.candidates[0].content.parts[0].text;
-    } catch (error) {
-        console.error("LLM Error:", error);
-        return "You got this!";
-    }
+    const data = await response.json();
+    console.log("Gemini response:", data);
+    return data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error("LLM Error:", error);
+    return "You got this!";
+  }
 }
 
 // Helper to display why an assignment is important based on its details (e.g. due date, course, etc.)
 async function determineWhyImportant(assignment) {
-    try {
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
             {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
+              parts: [
+                {
+                  text:
+                    `Given the following assignment details, explain in 1-2 sentences why this assignment might be important for a student to complete:\n\nTitle: ${assignment.title}\nCourse: ${assignment.course}\nDue Date: ${assignment.dueAt}\nRespond in a undergraduate student's tone` +
+                    getMotivationContext(),
                 },
-                body: JSON.stringify({
-                    contents: [
-                        {
-                            parts: [
-                                {
-                                    text: `Given the following assignment details, explain in 1-2 sentences why this assignment might be important for a student to complete:\n\nTitle: ${assignment.title}\nCourse: ${assignment.course}\nDue Date: ${assignment.dueAt}\nRespond in a undergraduate student's tone` + getMotivationContext(),
-                                },
-                            ],
-                        },
-                    ],
-                }),
-            }
-        );
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
-        const data = await response.json();
+    const data = await response.json();
 
-        console.log("Gemini importance response:", data);
-        return data.candidates[0].content.parts[0].text;
-    } catch (error) {
-        console.error("LLM Error:", error);
-        return "This assignment is important for your learning and success in the course!";
-    }
+    console.log("Gemini importance response:", data);
+    return data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error("LLM Error:", error);
+    return "This assignment is important for your learning and success in the course!";
+  }
 }
 
 function displayMotivation(message, msgElement) {
-    if (msgElement) {
-        msgElement.textContent = message;
-    }
+  if (msgElement) {
+    msgElement.textContent = message;
+  }
 }
 
 async function PromptLLM(msgElement) {
-    const motivationalMessage = await GetMotivation();
-    displayMotivation(motivationalMessage, msgElement);
+  const motivationalMessage = await GetMotivation();
+  displayMotivation(motivationalMessage, msgElement);
 }
