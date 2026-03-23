@@ -22,10 +22,10 @@ let previewPet = "cat1";
 
 const PATHS = {
   cat1: {
-    normal: "/Images/Cat/CatWagTail.gif",
-    happy: "/Images/Cat/CatHappy.gif",
-    hungry: "/Images/Cat/CatHungry.gif",
-    eating: "/Images/Cat/CatEating.gif",
+    normal: "/Images/Cat/Cat1Wag.gif",
+    happy: "/Images/Cat/Cat1Happy.gif",
+    hungry: "/Images/Cat/Cat1Hungry.gif",
+    eating: "/Images/Cat/Cat1Eating.gif",
   },
   cat2: {
     normal: "/Images/Cat/Cat2Wag.gif",
@@ -40,10 +40,10 @@ const PATHS = {
     eating: "/Images/Cat/Cat3Eating.gif",
   },
   dog1: {
-    normal: "/Images/Dog/DogTailWag.gif",
-    happy: "/Images/Dog/Happy Dog.gif",
-    hungry: "/Images/Dog/DogHungry.gif",
-    eating: "/Images/Dog/DogEating.gif",
+    normal: "/Images/Dog/Dog1Wag.gif",
+    happy: "/Images/Dog/Dog1Happy.gif",
+    hungry: "/Images/Dog/Dog1Hungry.gif",
+    eating: "/Images/Dog/Dog1Eating.gif",
   },
   dog2: {
     normal: "/Images/Dog/Dog2Wag.gif",
@@ -63,10 +63,10 @@ function refreshImage() {
   const mood = eatingToggle?.checked
     ? "eating"
     : hungerToggle?.checked
-      ? "hungry"
-      : moodToggle?.checked
-        ? "happy"
-        : "normal";
+    ? "hungry"
+    : moodToggle?.checked
+    ? "happy"
+    : "normal";
 
   if (!PATHS[previewPet] || !PATHS[previewPet][mood]) {
     console.log("Missing path for:", previewPet, mood);
@@ -83,8 +83,10 @@ function makeExclusive(activeToggle) {
   if (!activeToggle?.checked) return;
 
   if (activeToggle !== moodToggle && moodToggle) moodToggle.checked = false;
-  if (activeToggle !== hungerToggle && hungerToggle) hungerToggle.checked = false;
-  if (activeToggle !== eatingToggle && eatingToggle) eatingToggle.checked = false;
+  if (activeToggle !== hungerToggle && hungerToggle)
+    hungerToggle.checked = false;
+  if (activeToggle !== eatingToggle && eatingToggle)
+    eatingToggle.checked = false;
 }
 
 function handleHappyToggle() {
@@ -144,7 +146,9 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
 
   function setSlide(index) {
     items.forEach((item) => item.classList.remove("carousel__item--selected"));
-    buttons.forEach((btn) => btn.classList.remove("carousel__button--selected"));
+    buttons.forEach((btn) =>
+      btn.classList.remove("carousel__button--selected")
+    );
 
     items[index].classList.add("carousel__item--selected");
     buttons[index].classList.add("carousel__button--selected");
@@ -182,54 +186,58 @@ document.querySelectorAll(".carousel").forEach((carousel) => {
   setSlide(0);
 });
 
-document.querySelectorAll(".motivation-questionnaire").forEach((questionnaire) => {
-  const classQ = questionnaire.querySelectorAll(".class__questions");
-  let currClassInd = 0;
+document
+  .querySelectorAll(".motivation-questionnaire")
+  .forEach((questionnaire) => {
+    const classQ = questionnaire.querySelectorAll(".class__questions");
+    let currClassInd = 0;
 
-  classQ.forEach((classQuestion) => {
-    addLikertScales(classQuestion);
+    classQ.forEach((classQuestion) => {
+      addLikertScales(classQuestion);
+    });
+
+    const nextClassBtn = document.getElementById("questionnaire-next");
+    const prevClassBtn = document.getElementById("questionnaire-prev");
+    const submitBtn = document.getElementById("questionnaire-submit");
+    prevClassBtn.classList.add("disabled");
+
+    function setClass(index) {
+      classQ.forEach((item) =>
+        item.classList.remove("class__questions--selected")
+      );
+      classQ[index].classList.add("class__questions--selected");
+    }
+
+    classQ[0].classList.add("class__questions--selected");
+
+    if (nextClassBtn && prevClassBtn && submitBtn) {
+      nextClassBtn.addEventListener("click", () => {
+        prevClassBtn.classList.remove("disabled");
+        currClassInd += 1;
+        if (currClassInd >= classQ.length - 1) {
+          nextClassBtn.style.display = "none";
+          submitBtn.style.display = "block";
+        }
+        setClass(currClassInd);
+      });
+
+      prevClassBtn.addEventListener("click", () => {
+        currClassInd -= 1;
+        nextClassBtn.style.display = "block";
+        submitBtn.style.display = "none";
+        if (currClassInd <= 0) {
+          prevClassBtn.classList.add("disabled");
+          currClassInd = 0;
+        }
+
+        setClass(currClassInd);
+      });
+
+      submitBtn.addEventListener("click", () => {
+        submitQuestionnaire();
+      });
+    }
   });
-
-  const nextClassBtn = document.getElementById("questionnaire-next");
-  const prevClassBtn = document.getElementById("questionnaire-prev");
-  const submitBtn = document.getElementById("questionnaire-submit");
-  prevClassBtn.classList.add("disabled");
-
-  function setClass(index) {
-    classQ.forEach((item) => item.classList.remove("class__questions--selected"));
-    classQ[index].classList.add("class__questions--selected");
-  }
-
-  classQ[0].classList.add("class__questions--selected");
-
-  if (nextClassBtn && prevClassBtn && submitBtn) {
-    nextClassBtn.addEventListener("click", () => {
-      prevClassBtn.classList.remove("disabled");
-      currClassInd += 1;
-      if (currClassInd >= classQ.length - 1) {
-        nextClassBtn.style.display = "none";
-        submitBtn.style.display = "block";
-      }
-      setClass(currClassInd);
-    });
-
-    prevClassBtn.addEventListener("click", () => {
-      currClassInd -= 1;
-      nextClassBtn.style.display = "block";
-      submitBtn.style.display = "none";
-      if (currClassInd <= 0) {
-        prevClassBtn.classList.add("disabled");
-        currClassInd = 0;
-      }
-
-      setClass(currClassInd);
-    });
-
-    submitBtn.addEventListener("click", () => {
-      submitQuestionnaire();
-    });
-  }
-});
 
 function submitQuestionnaire() {
   const submitBtn = document.getElementById("questionnaire-submit");
@@ -240,7 +248,7 @@ function submitQuestionnaire() {
     const selected = likert.querySelector("input[type='radio']:checked");
     answers.push({
       question,
-      answer: selected ? Number(selected.value) : null
+      answer: selected ? Number(selected.value) : null,
     });
   });
 
@@ -250,7 +258,9 @@ function submitQuestionnaire() {
 
     console.log("Questionnaire answers saved:", answers);
     submitBtn.textContent = "Submitted!";
-    setTimeout(() => { submitBtn.textContent = "Submit"; }, 2000);
+    setTimeout(() => {
+      submitBtn.textContent = "Submit";
+    }, 2000);
   });
 }
 
@@ -268,20 +278,20 @@ function addLikertScales(classDoc, parentId) {
         </div>
         <div class ="likertBtns">
           <input name="` +
-      name +
-      `" type="radio" value="1" />
+        name +
+        `" type="radio" value="1" />
           <input name="` +
-      name +
-      `" type="radio" value="2" />
+        name +
+        `" type="radio" value="2" />
           <input name="` +
-      name +
-      `" type="radio" value="3" />
+        name +
+        `" type="radio" value="3" />
           <input name="` +
-      name +
-      `" type="radio" value="4" />
+        name +
+        `" type="radio" value="4" />
           <input name="` +
-      name +
-      `" type="radio" value="5" />
+        name +
+        `" type="radio" value="5" />
         </div>
         `
     );
