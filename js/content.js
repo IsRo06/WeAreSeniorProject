@@ -332,7 +332,7 @@ function createPetImages() {
   const petMotivateBtn = document.createElement("button");
   const spacer = document.createElement("br");
   const settingsBtn = document.createElement("button");
-  const settingsPanel = document.createElement("div");
+  const settingsPanel = createSettingsPanel();
 
   const moodToggleLabel = document.createElement("label");
   const moodToggleCheck = document.createElement("input");
@@ -404,14 +404,6 @@ function createPetImages() {
 	settingsBtn.style.color = "white";
 	settingsBtn.style.marginLeft="90%";
 
-
-	settingsPanel.style.display = "none"; 
-	settingsPanel.style.backgroundColor = "white";
-	settingsPanel.style.borderRadius = "5px";
-	settingsPanel.style.padding = "10px";
-	settingsPanel.style.marginTop = "8px";
-	settingsPanel.style.color = "black";
-	settingsPanel.textContent = "Insert Settings Here";
 
   moodToggleLabel.for = "moodToggle";
   moodToggleLabel.textContent = "Happy";
@@ -489,6 +481,114 @@ function createPetImages() {
 
   return parentDoc;
 }
+
+function createSettingsPanel() {
+	const parentDoc = document.createElement("div");
+
+	parentDoc.style.display = "none"; 
+	parentDoc.style.backgroundColor = "white";
+	parentDoc.style.borderRadius = "5px";
+	parentDoc.style.padding = "10px";
+	parentDoc.style.marginTop = "8px";
+	parentDoc.style.color = "black";
+	parentDoc.textContent = "Yeehaw";
+
+	const petContainer = document.createElement("div");
+	petContainer.style.display = "flex";
+	petContainer.style.gap = "6px";
+	
+	const carouselWrapper = document.createElement("div");
+	carouselWrapper.style.display = "flex";
+	carouselWrapper.style.alignItems = "center";
+	carouselWrapper.style.justifyContent = "center";
+	carouselWrapper.style.gap = "6px";
+	carouselWrapper.style.backgroundColor = colorScene;
+	carouselWrapper.style.borderRadius = "5px";
+
+	const prevBtn = document.createElement("button");
+	const nextBtn = document.createElement("button");
+
+	prevBtn.textContent = "‹";
+	nextBtn.textContent = "›";
+
+	[prevBtn, nextBtn].forEach((btn) => {
+		btn.style.background = "transparent";
+		btn.style.border = "none";
+		btn.style.color = "white";
+		btn.style.fontSize = "18px";
+		btn.style.cursor = "pointer";
+	});
+
+	const pets = ["cat1", "cat2", "cat3", "dog1", "dog2", "dog3"];
+	let currentIndex = 0;
+
+	const img = document.createElement("img");
+	img.style.width = "60px";
+	img.style.height = "60px";
+	img.style.objectFit = "contain";
+
+	function updateCarouselImage() {
+		paths = getAnimalPaths();
+		const pet = pets[currentIndex];
+		img.src = paths[pet].normal;
+	}
+
+	nextBtn.addEventListener("click", () => {
+		currentIndex = (currentIndex + 1) % pets.length;
+		updateCarouselImage();
+	});
+
+	prevBtn.addEventListener("click", () => {
+		currentIndex = (currentIndex - 1 + pets.length) % pets.length;
+		updateCarouselImage();
+	});
+
+	img.addEventListener("click", async () => {
+		const selectedPet = pets[currentIndex];
+
+		await chrome.storage.local.set({ selectedPet });
+
+		console.log("Selected pet:", selectedPet);
+	});
+
+	chrome.storage.local.get(["selectedPet"], (result) => {
+		if (result.selectedPet) {
+			const index = pets.indexOf(result.selectedPet);
+			if (index !== -1) {
+				currentIndex = index;
+			}
+		}
+
+		updateCarouselImage();
+	});
+
+	/*
+	pets.forEach((pet) => {
+		const img = document.createElement("img");
+
+		img.src = getAnimalPaths()[pet].normal;
+		img.style.width = "40px";
+		img.style.height = "40px";
+		img.style.cursor = "pointer";
+		img.style.borderRadius = "4px";
+
+		img.addEventListener("click", async () => {
+			await chrome.storage.local.set({ selectedPet: pet });
+		});
+
+		petContainer.appendChild(img);
+	});
+	*/
+
+	parentDoc.appendChild(petContainer);
+	carouselWrapper.appendChild(prevBtn);
+	carouselWrapper.appendChild(img);
+	carouselWrapper.appendChild(nextBtn);
+
+	parentDoc.appendChild(carouselWrapper);
+	return parentDoc;
+}
+
 
 function createToDoList() {
   motivationCheck();
