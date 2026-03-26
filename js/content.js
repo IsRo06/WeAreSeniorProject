@@ -331,6 +331,8 @@ function createPetImages() {
   const petRefreshBtn = document.createElement("button");
   const petMotivateBtn = document.createElement("button");
   const spacer = document.createElement("br");
+  const settingsBtn = document.createElement("button");
+  const settingsPanel = document.createElement("div");
 
   const moodToggleLabel = document.createElement("label");
   const moodToggleCheck = document.createElement("input");
@@ -392,11 +394,31 @@ function createPetImages() {
   petMotivateBtn.style.marginTop = "4px";
   petMotivateBtn.textContent = "Get Motivation!";
 
+	settingsBtn.textContent = "\u2699"; 
+
+	settingsBtn.style.background = "transparent";
+	settingsBtn.style.border = "none";
+	settingsBtn.style.cursor = "pointer";
+	settingsBtn.style.fontSize = "18px";
+	settingsBtn.style.padding = "4px";
+	settingsBtn.style.color = "white";
+	settingsBtn.style.marginLeft="90%";
+
+
+	settingsPanel.style.display = "none"; 
+	settingsPanel.style.backgroundColor = "white";
+	settingsPanel.style.borderRadius = "5px";
+	settingsPanel.style.padding = "10px";
+	settingsPanel.style.marginTop = "8px";
+	settingsPanel.style.color = "black";
+	settingsPanel.textContent = "Insert Settings Here";
+
   moodToggleLabel.for = "moodToggle";
   moodToggleLabel.textContent = "Happy";
   moodToggleLabel.style.color = "white";
   moodToggleCheck.type = "checkbox";
   moodToggleCheck.id = "moodToggle";
+
 
   updatePet(moodToggleCheck, petImg);
 
@@ -419,6 +441,14 @@ function createPetImages() {
       PromptLLM(motivationMsg);
     }
   });
+
+	settingsBtn.addEventListener("click", () => {
+		if (settingsPanel.style.display === "none") {
+			settingsPanel.style.display = "block";
+		} else {
+			settingsPanel.style.display = "none";
+		}
+	});
 
   const petRow = document.createElement("div");
   petRow.id = "petRow";
@@ -444,12 +474,14 @@ function createPetImages() {
   petRow.appendChild(petImg);
   petRow.appendChild(petHouse);
 
+	parentDoc.appendChild(settingsBtn);
   parentDoc.appendChild(petScene);
   petScene.appendChild(motivationMsg);
   petScene.appendChild(petRow);
 
   parentDoc.appendChild(petRefreshBtn);
   parentDoc.appendChild(petMotivateBtn);
+	parentDoc.appendChild(settingsPanel);
   parentDoc.appendChild(spacer);
 
   // parentDoc.appendChild(moodToggleCheck);
