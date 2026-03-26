@@ -304,6 +304,8 @@ function renderCanvasPets(element) {
   const petStats = createPetStats();
   const toDoList = createToDoList();
 
+	canvasPets.id = "canvas-pets-root";
+
   title.textContent = "Welcome to Canvas Pets!";
   title.style.textAlign = "center";
 
@@ -484,6 +486,8 @@ function createPetImages() {
 
 function createSettingsPanel() {
 	const parentDoc = document.createElement("div");
+	const petContainer = createPetCarousel();
+	const motivationQuestionContainer = createMotivationQuestionnaire();
 
 	parentDoc.style.display = "none"; 
 	parentDoc.style.backgroundColor = "white";
@@ -491,11 +495,17 @@ function createSettingsPanel() {
 	parentDoc.style.padding = "10px";
 	parentDoc.style.marginTop = "8px";
 	parentDoc.style.color = "black";
-	parentDoc.textContent = "Yeehaw";
+	parentDoc.textContent = "Settings";
+	parentDoc.style.textAlign = "center";
 
-	const petContainer = document.createElement("div");
-	petContainer.style.display = "flex";
-	petContainer.style.gap = "6px";
+	parentDoc.appendChild(petContainer);
+	parentDoc.appendChild(motivationQuestionContainer);
+	return parentDoc;
+}
+
+function createPetCarousel(){
+	const parentDoc = document.createElement("div");
+	parentDoc.style.width = "100%";
 	
 	const carouselWrapper = document.createElement("div");
 	carouselWrapper.style.display = "flex";
@@ -507,6 +517,7 @@ function createSettingsPanel() {
 
 	const prevBtn = document.createElement("button");
 	const nextBtn = document.createElement("button");
+	const selectPetBtn = document.createElement("button");
 
 	prevBtn.textContent = "‹";
 	nextBtn.textContent = "›";
@@ -518,6 +529,17 @@ function createSettingsPanel() {
 		btn.style.fontSize = "18px";
 		btn.style.cursor = "pointer";
 	});
+	
+  selectPetBtn.style.backgroundColor = colorBtn;
+  selectPetBtn.style.border = "none";
+  selectPetBtn.style.borderRadius = "5px";
+  selectPetBtn.style.color = "white";
+  selectPetBtn.style.padding = "10px";
+  selectPetBtn.style.textAlign = "center";
+  selectPetBtn.style.cursor = "pointer";
+  selectPetBtn.style.width = "100%";
+  selectPetBtn.style.marginTop = "4px";
+  selectPetBtn.textContent = "Select Pet";
 
 	const pets = ["cat1", "cat2", "cat3", "dog1", "dog2", "dog3"];
 	let currentIndex = 0;
@@ -543,7 +565,8 @@ function createSettingsPanel() {
 		updateCarouselImage();
 	});
 
-	img.addEventListener("click", async () => {
+
+	selectPetBtn.addEventListener("click", async () => {
 		const selectedPet = pets[currentIndex];
 
 		await chrome.storage.local.set({ selectedPet });
@@ -562,32 +585,166 @@ function createSettingsPanel() {
 		updateCarouselImage();
 	});
 
-	/*
-	pets.forEach((pet) => {
-		const img = document.createElement("img");
-
-		img.src = getAnimalPaths()[pet].normal;
-		img.style.width = "40px";
-		img.style.height = "40px";
-		img.style.cursor = "pointer";
-		img.style.borderRadius = "4px";
-
-		img.addEventListener("click", async () => {
-			await chrome.storage.local.set({ selectedPet: pet });
-		});
-
-		petContainer.appendChild(img);
-	});
-	*/
-
-	parentDoc.appendChild(petContainer);
 	carouselWrapper.appendChild(prevBtn);
 	carouselWrapper.appendChild(img);
 	carouselWrapper.appendChild(nextBtn);
 
 	parentDoc.appendChild(carouselWrapper);
+	parentDoc.appendChild(selectPetBtn);
+	return parentDoc;
+
+}
+
+function createMotivationQuestionnaire(){
+	const parentDoc = document.createElement("div");
+
+	parentDoc.innerHTML = `
+				<div class="screen" id="questionnaireScreen">
+				<h2> Motivation Setup </h2>
+				<div class="motivation-questionnaire">
+				<p> Answer these statements to help your pet motivate you! </p>
+					<div class="class__questions" id="extrinsic">
+						<div class="class-header">
+							<h3> Extrinsic Motivation </h3>
+						</div>
+						<div class="questions-wrapper">
+							<div class="likert">
+								<p class="likertQuestion">Receiving financial rewards motivates me to perform better.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">Achieving high grades motivates me to put more effort into my work.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">Being publicly recognized for my work motivates me to perform better.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">Receiving praise from instructors or supervisors motivates me to improve my performance.</p>
+							</div>
+						</div>
+					</div>
+					<div class="class__questions" id="intrinsic">
+						<div class="class-header">
+							<h3> Intrinsic Motivation </h3>
+						</div>
+						<div class="questions-wrapper">
+							<div class="likert">
+								<p class="likertQuestion">My curiosity about the subject motivates me to put more effort into my coursework.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">The desire to improve my skills and develop mastery motivates me to perform better in my coursework.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">Enjoying the process of learning and solving problems motivates me to perform better in my coursework.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">Believing that what I am learning is meaningful or valuable motivates me to put more effort into my coursework.</p>
+							</div>
+						</div>
+					</div>
+					<div class="questionnaire-nav">
+						<button id="questionnaire-prev" class="questionnaire-nav-btn"> Previous </button>
+						<button id="questionnaire-next" class="questionnaire-nav-btn"> Next </button>
+						<button id="questionnaire-submit" class="questionnaire-nav-btn"> Submit </button>
+					</div>
+				</div>
+				<button id="toCustomization" class="btn">&#10094; Back </button>
+
+			</div>
+		</div>
+
+		`;
+	/*
+	const toQuestionnaireBtn = parentDoc.querySelector("toQuestionnaire");
+	const toCustomizationBtn = parentDoc.querySelector("toCustomization");
+
+	parentDoc
+		.querySelectorAll(".motivation-questionnaire")
+		.forEach((questionnaire) => {
+			const classQ = questionnaire.querySelectorAll(".class__questions");
+			let currClassInd = 0;
+
+			classQ.forEach((classQuestion) => {
+				addLikertScales(classQuestion);
+			});
+
+			const nextClassBtn = parentDoc.querySelector("questionnaire-next");
+			const prevClassBtn = parentDoc.querySelector("questionnaire-prev");
+			const submitBtn = parentDoc.querySelector("questionnaire-submit");
+			prevClassBtn.classList.add("disabled");
+
+			function setClass(index) {
+				classQ.forEach((item) =>
+					item.classList.remove("class__questions--selected")
+				);
+				classQ[index].classList.add("class__questions--selected");
+			}
+
+			classQ[0].classList.add("class__questions--selected");
+
+			if (nextClassBtn && prevClassBtn && submitBtn) {
+				nextClassBtn.addEventListener("click", () => {
+					prevClassBtn.classList.remove("disabled");
+					currClassInd += 1;
+					if (currClassInd >= classQ.length - 1) {
+						nextClassBtn.style.display = "none";
+						submitBtn.style.display = "block";
+					}
+					setClass(currClassInd);
+				});
+
+				prevClassBtn.addEventListener("click", () => {
+					currClassInd -= 1;
+					nextClassBtn.style.display = "block";
+					submitBtn.style.display = "none";
+					if (currClassInd <= 0) {
+						prevClassBtn.classList.add("disabled");
+						currClassInd = 0;
+					}
+
+					setClass(currClassInd);
+				});
+
+				submitBtn.addEventListener("click", () => {
+					submitQuestionnaire();
+				});
+			}
+		});
+
+	toQuestionnaireBtn.addEventListener("click", () => {
+		const customizeScreen = document.getElementById("customizeScreen");
+		const questionnaireScreen = document.getElementById("questionnaireScreen");
+
+		customizeScreen.classList.remove("screen--selected");
+		customizeScreen.classList.add("screen");
+
+		questionnaireScreen.classList.add("screen--selected");
+		questionnaireScreen.classList.remove("screen");
+	});
+
+	toCustomizationBtn.addEventListener("click", () => {
+		const customizeScreen = document.getElementById("customizeScreen");
+		const questionnaireScreen = document.getElementById("questionnaireScreen");
+
+		questionnaireScreen.classList.remove("screen--selected");
+		questionnaireScreen.classList.add("screen");
+
+		customizeScreen.classList.add("screen--selected");
+		customizeScreen.classList.remove("screen");
+	});
+
+
+	parentDoc.querySelectorAll(".class__questions").forEach((classQ) => {
+		addLikertScales(classQ);
+	});
+	parentDoc
+		.querySelector("#questionnaire-submit")
+		.addEventListener("click", submitQuestionnaire);
+
+	*/
+
 	return parentDoc;
 }
+
 
 
 function createToDoList() {
@@ -998,4 +1155,64 @@ function displayMotivation(message, msgElement) {
 async function PromptLLM(msgElement) {
   const motivationalMessage = await GetMotivation();
   displayMotivation(motivationalMessage, msgElement);
+}
+
+function addLikertScales(classDoc, parentId) {
+  const items = classDoc.querySelectorAll(".likert");
+  let i = 1;
+  items.forEach((question) => {
+    const name = "" + classDoc.id + i;
+    question.insertAdjacentHTML(
+      "beforeend",
+      `
+        <div class="likertLabels">
+          <p>Disagree</p>
+          <p>Agree</p>
+        </div>
+        <div class ="likertBtns">
+          <input name="` +
+        name +
+        `" type="radio" value="1" />
+          <input name="` +
+        name +
+        `" type="radio" value="2" />
+          <input name="` +
+        name +
+        `" type="radio" value="3" />
+          <input name="` +
+        name +
+        `" type="radio" value="4" />
+          <input name="` +
+        name +
+        `" type="radio" value="5" />
+        </div>
+        `
+    );
+    i++;
+  });
+}
+
+function submitQuestionnaire() {
+  const submitBtn = document.getElementById("questionnaire-submit");
+  const answers = [];
+
+  document.querySelectorAll(".likert").forEach((likert) => {
+    const question = likert.querySelector(".likertQuestion").textContent.trim();
+    const selected = likert.querySelector("input[type='radio']:checked");
+    answers.push({
+      question,
+      answer: selected ? Number(selected.value) : null,
+    });
+  });
+
+  chrome.storage.local.set({ motivationAnswers: answers }, function () {
+    // Clear cached whyImportant since we have a new context
+    chrome.storage.local.remove(["assignments", "updatedAt"]);
+
+    console.log("Questionnaire answers saved:", answers);
+    submitBtn.textContent = "Submitted!";
+    setTimeout(() => {
+      submitBtn.textContent = "Submit";
+    }, 2000);
+  });
 }
