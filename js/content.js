@@ -304,6 +304,8 @@ function renderCanvasPets(element) {
   const petStats = createPetStats();
   const toDoList = createToDoList();
 
+	canvasPets.id = "canvas-pets-root";
+
   title.textContent = "Welcome to Canvas Pets!";
   title.style.textAlign = "center";
 
@@ -331,6 +333,8 @@ function createPetImages() {
   const petRefreshBtn = document.createElement("button");
   const petMotivateBtn = document.createElement("button");
   const spacer = document.createElement("br");
+  const settingsBtn = document.createElement("button");
+  const settingsPanel = createSettingsPanel();
 
   const moodToggleLabel = document.createElement("label");
   const moodToggleCheck = document.createElement("input");
@@ -392,11 +396,23 @@ function createPetImages() {
   petMotivateBtn.style.marginTop = "4px";
   petMotivateBtn.textContent = "Get Motivation!";
 
+	settingsBtn.textContent = "\u2699"; 
+
+	settingsBtn.style.background = "transparent";
+	settingsBtn.style.border = "none";
+	settingsBtn.style.cursor = "pointer";
+	settingsBtn.style.fontSize = "18px";
+	settingsBtn.style.padding = "4px";
+	settingsBtn.style.color = "white";
+	settingsBtn.style.marginLeft="90%";
+
+
   moodToggleLabel.for = "moodToggle";
   moodToggleLabel.textContent = "Happy";
   moodToggleLabel.style.color = "white";
   moodToggleCheck.type = "checkbox";
   moodToggleCheck.id = "moodToggle";
+
 
   updatePet(moodToggleCheck, petImg);
 
@@ -419,6 +435,14 @@ function createPetImages() {
       PromptLLM(motivationMsg);
     }
   });
+
+	settingsBtn.addEventListener("click", () => {
+		if (settingsPanel.style.display === "none") {
+			settingsPanel.style.display = "block";
+		} else {
+			settingsPanel.style.display = "none";
+		}
+	});
 
   const petRow = document.createElement("div");
   petRow.id = "petRow";
@@ -444,12 +468,14 @@ function createPetImages() {
   petRow.appendChild(petImg);
   petRow.appendChild(petHouse);
 
+	parentDoc.appendChild(settingsBtn);
   parentDoc.appendChild(petScene);
   petScene.appendChild(motivationMsg);
   petScene.appendChild(petRow);
 
   parentDoc.appendChild(petRefreshBtn);
   parentDoc.appendChild(petMotivateBtn);
+	parentDoc.appendChild(settingsPanel);
   parentDoc.appendChild(spacer);
 
   // parentDoc.appendChild(moodToggleCheck);
@@ -457,6 +483,139 @@ function createPetImages() {
 
   return parentDoc;
 }
+
+function createSettingsPanel() {
+	const parentDoc = document.createElement("div");
+
+	const petContainer = createPetCarousel();
+	// const motivationQuestionContainer = createMotivationQuestionnaire();
+
+	const motivationBtn = document.createElement("button");
+
+	parentDoc.style.display = "none"; 
+	parentDoc.style.backgroundColor = "white";
+	parentDoc.style.borderRadius = "5px";
+	parentDoc.style.padding = "10px";
+	parentDoc.style.marginTop = "8px";
+	parentDoc.style.color = "black";
+	parentDoc.textContent = "Settings";
+	parentDoc.style.textAlign = "center";
+
+	motivationBtn.style.backgroundColor = colorBtn;
+	motivationBtn.style.border = "none";
+	motivationBtn.style.borderRadius = "5px";
+	motivationBtn.style.color = "white";
+	motivationBtn.style.padding = "10px";
+	motivationBtn.style.textAlign = "center";
+	motivationBtn.style.cursor = "pointer";
+	motivationBtn.style.width = "100%";
+	motivationBtn.style.marginTop = "4px";
+	motivationBtn.textContent =  "Motivation Setup";
+
+	motivationBtn.addEventListener("click", () => {
+		chrome.runtime.sendMessage({ action: "openMotivation" });
+	});
+
+	parentDoc.appendChild(petContainer);
+	parentDoc.appendChild(motivationBtn);
+	// parentDoc.appendChild(motivationQuestionContainer);
+	return parentDoc;
+}
+
+function createPetCarousel(){
+	const parentDoc = document.createElement("div");
+	parentDoc.style.width = "100%";
+	
+	const carouselWrapper = document.createElement("div");
+	carouselWrapper.style.display = "flex";
+	carouselWrapper.style.alignItems = "center";
+	carouselWrapper.style.justifyContent = "center";
+	carouselWrapper.style.gap = "6px";
+	carouselWrapper.style.backgroundColor = colorScene;
+	carouselWrapper.style.borderRadius = "5px";
+
+	const prevBtn = document.createElement("button");
+	const nextBtn = document.createElement("button");
+	const selectPetBtn = document.createElement("button");
+
+	prevBtn.textContent = "‹";
+	nextBtn.textContent = "›";
+
+	[prevBtn, nextBtn].forEach((btn) => {
+		btn.style.background = "transparent";
+		btn.style.border = "none";
+		btn.style.color = "white";
+		btn.style.fontSize = "18px";
+		btn.style.cursor = "pointer";
+	});
+	
+  selectPetBtn.style.backgroundColor = colorBtn;
+  selectPetBtn.style.border = "none";
+  selectPetBtn.style.borderRadius = "5px";
+  selectPetBtn.style.color = "white";
+  selectPetBtn.style.padding = "10px";
+  selectPetBtn.style.textAlign = "center";
+  selectPetBtn.style.cursor = "pointer";
+  selectPetBtn.style.width = "100%";
+  selectPetBtn.style.marginTop = "4px";
+  selectPetBtn.textContent = "Select Pet";
+
+	const pets = ["cat1", "cat2", "cat3", "dog1", "dog2", "dog3"];
+	let currentIndex = 0;
+
+	const img = document.createElement("img");
+	img.style.width = "60px";
+	img.style.height = "60px";
+	img.style.objectFit = "contain";
+
+	function updateCarouselImage() {
+		paths = getAnimalPaths();
+		const pet = pets[currentIndex];
+		img.src = paths[pet].normal;
+	}
+
+	nextBtn.addEventListener("click", () => {
+		currentIndex = (currentIndex + 1) % pets.length;
+		updateCarouselImage();
+	});
+
+	prevBtn.addEventListener("click", () => {
+		currentIndex = (currentIndex - 1 + pets.length) % pets.length;
+		updateCarouselImage();
+	});
+
+
+	selectPetBtn.addEventListener("click", async () => {
+		const selectedPet = pets[currentIndex];
+
+		await chrome.storage.local.set({ selectedPet });
+
+		console.log("Selected pet:", selectedPet);
+	});
+
+	chrome.storage.local.get(["selectedPet"], (result) => {
+		if (result.selectedPet) {
+			const index = pets.indexOf(result.selectedPet);
+			if (index !== -1) {
+				currentIndex = index;
+			}
+		}
+
+		updateCarouselImage();
+	});
+
+	carouselWrapper.appendChild(prevBtn);
+	carouselWrapper.appendChild(img);
+	carouselWrapper.appendChild(nextBtn);
+
+	parentDoc.appendChild(carouselWrapper);
+	parentDoc.appendChild(selectPetBtn);
+	return parentDoc;
+
+}
+
+
+
 
 function createToDoList() {
   motivationCheck();
