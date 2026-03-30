@@ -1,5 +1,5 @@
 {
-  "name": "Hello World!!",
+  "name": "Canvas Pets",
   "description": "Base Level Extension",
   "version": "1.0",
   "manifest_version": 3,
@@ -32,7 +32,8 @@
         "assets/*.gif",
         "Images/*.jpg",
         "Images/*.gif",
-        "Images/*.png"
+        "Images/*.png",
+        "Images/**.gif"
       ],
       "matches": ["<all_urls>"]
     }

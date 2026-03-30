@@ -8,11 +8,28 @@
 					<button class="carousel__arrow carousel__arrow--left" id="prevBtn">&#10094;</button>
 					<div class="carousel">
 
-						<div class="carousel__item" data-pet="cat">
+						<div class="carousel__item" data-pet="cat1">
 							<img id="catImg" src="/Images/Cat/CatWagTail.gif" />
 						</div>
-						<div class="carousel__item" data-pet="dog">
+
+						<div class="carousel__item" data-pet="cat2">
+							<img src="/Images/Cat/Cat2Wag.gif" />
+						</div>
+
+						<div class="carousel__item" data-pet="cat3">
+							<img src="/Images/Cat/Cat3Wag.gif" />
+						</div>
+
+						<div class="carousel__item" data-pet="dog1">
 							<img id="dogImg" src="/Images/Dog/DogTailWag.gif" />
+						</div>
+
+						<div class="carousel__item" data-pet="dog2">
+							<img src="/Images/Dog/Dog2Wag.gif" />
+						</div>
+
+						<div class="carousel__item" data-pet="dog3">
+							<img src="/Images/Dog/Dog3Wag.gif" />
 						</div>
 
 					</div>
@@ -22,39 +39,71 @@
 				<button id="selectBtn" class="btn">Select Pet</button>
 				<br/>
 
-				<label>
-					<input type="checkbox" id="moodToggle">
-					Happy
-				</label>
+				<!-- Testing: Turn on -> "display: block;"    Turn Off -> "display: none;"-->
+        <div id="testingControls" style="display: none;">
+          <label>
+            <input type="checkbox" id="moodToggle">
+            Happy
+          </label>
 
-				<br/>
+          <br/>
 
-				<label>
-					<input type="checkbox" id="hungerToggle" />
-					Hungry
-				</label>
+          <label>
+            <input type="checkbox" id="hungerToggle" />
+            Hungry
+          </label>
 
-				<br/>
+          <br/>
 
-				<label>
-					<input type="checkbox" id="eatingToggle" />
-					Eating
-				</label>
+          <label>
+            <input type="checkbox" id="eatingToggle" />
+            Eating
+          </label>
+        </div>
 
-				<button id="toQuestionnaire" class="btn">Motivation Questionnaire &#10095;</button>
+				<button id="toQuestionnaire" class="btn">Motivation Setup &#10095;</button>
 			</div>
 
 			<div class="screen" id="questionnaireScreen">
-				<h2> Class Motivations </h2>
+				<h2> Motivation Setup </h2>
 				<div class="motivation-questionnaire">
-					<div class="class__questions">
+				<p> Answer these statements to help your pet motivate you! </p>
+					<div class="class__questions" id="extrinsic">
 						<div class="class-header">
-							<h3> Class: Basics of Programming </h3>
+							<h3> Extrinsic Motivation </h3>
+						</div>
+						<div class="questions-wrapper">
+							<div class="likert">
+								<p class="likertQuestion">Receiving financial rewards motivates me to perform better.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">Achieving high grades motivates me to put more effort into my work.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">Being publicly recognized for my work motivates me to perform better.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">Receiving praise from instructors or supervisors motivates me to improve my performance.</p>
+							</div>
 						</div>
 					</div>
-					<div class="class__questions">
+					<div class="class__questions" id="intrinsic">
 						<div class="class-header">
-							<h3> Class: Computer Organization </h3>
+							<h3> Intrinsic Motivation </h3>
+						</div>
+						<div class="questions-wrapper">
+							<div class="likert">
+								<p class="likertQuestion">My curiosity about the subject motivates me to put more effort into my coursework.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">The desire to improve my skills and develop mastery motivates me to perform better in my coursework.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">Enjoying the process of learning and solving problems motivates me to perform better in my coursework.</p>
+							</div>
+							<div class="likert">
+								<p class="likertQuestion">Believing that what I am learning is meaningful or valuable motivates me to put more effort into my coursework.</p>
+							</div>
 						</div>
 					</div>
 					<div class="questionnaire-nav">
