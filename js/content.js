@@ -270,6 +270,12 @@ function getAnimalPaths() {
       hungry: chrome.runtime.getURL("/Images/Dog/Dog3Hungry.gif"),
       eating: chrome.runtime.getURL("/Images/Dog/Dog3Eating.gif"),
     },
+    axolotl: {
+      normal: chrome.runtime.getURL("/Images/Axolotl/AxolotlWag.gif"),
+      happy: chrome.runtime.getURL("/Images/Axolotl/AxolotlHappy.gif"),
+      hungry: chrome.runtime.getURL("/Images/Axolotl/AxolotlHungry.gif"),
+      eating: chrome.runtime.getURL("/Images/Axolotl/AxolotlEating.gif"),
+    },
   };
 }
 
@@ -558,7 +564,7 @@ function createPetCarousel() {
   selectPetBtn.style.marginTop = "4px";
   selectPetBtn.textContent = "Select Pet";
 
-  const pets = ["cat1", "cat2", "cat3", "dog1", "dog2", "dog3"];
+  const pets = ["cat1", "cat2", "cat3", "dog1", "dog2", "dog3", "axolotl"];
   let currentIndex = 0;
 
   const img = document.createElement("img");
