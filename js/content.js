@@ -304,7 +304,7 @@ function renderCanvasPets(element) {
   const petStats = createPetStats();
   const toDoList = createToDoList();
 
-	canvasPets.id = "canvas-pets-root";
+  canvasPets.id = "canvas-pets-root";
 
   title.textContent = "Welcome to Canvas Pets!";
   title.style.textAlign = "center";
@@ -396,23 +396,21 @@ function createPetImages() {
   petMotivateBtn.style.marginTop = "4px";
   petMotivateBtn.textContent = "Get Motivation!";
 
-	settingsBtn.textContent = "\u2699"; 
+  settingsBtn.textContent = "\u2699";
 
-	settingsBtn.style.background = "transparent";
-	settingsBtn.style.border = "none";
-	settingsBtn.style.cursor = "pointer";
-	settingsBtn.style.fontSize = "18px";
-	settingsBtn.style.padding = "4px";
-	settingsBtn.style.color = "white";
-	settingsBtn.style.marginLeft="90%";
-
+  settingsBtn.style.background = "transparent";
+  settingsBtn.style.border = "none";
+  settingsBtn.style.cursor = "pointer";
+  settingsBtn.style.fontSize = "18px";
+  settingsBtn.style.padding = "4px";
+  settingsBtn.style.color = "white";
+  settingsBtn.style.marginLeft = "90%";
 
   moodToggleLabel.for = "moodToggle";
   moodToggleLabel.textContent = "Happy";
   moodToggleLabel.style.color = "white";
   moodToggleCheck.type = "checkbox";
   moodToggleCheck.id = "moodToggle";
-
 
   updatePet(moodToggleCheck, petImg);
 
@@ -436,13 +434,13 @@ function createPetImages() {
     }
   });
 
-	settingsBtn.addEventListener("click", () => {
-		if (settingsPanel.style.display === "none") {
-			settingsPanel.style.display = "block";
-		} else {
-			settingsPanel.style.display = "none";
-		}
-	});
+  settingsBtn.addEventListener("click", () => {
+    if (settingsPanel.style.display === "none") {
+      settingsPanel.style.display = "block";
+    } else {
+      settingsPanel.style.display = "none";
+    }
+  });
 
   const petRow = document.createElement("div");
   petRow.id = "petRow";
@@ -468,14 +466,14 @@ function createPetImages() {
   petRow.appendChild(petImg);
   petRow.appendChild(petHouse);
 
-	parentDoc.appendChild(settingsBtn);
+  parentDoc.appendChild(settingsBtn);
   parentDoc.appendChild(petScene);
   petScene.appendChild(motivationMsg);
   petScene.appendChild(petRow);
 
   parentDoc.appendChild(petRefreshBtn);
   parentDoc.appendChild(petMotivateBtn);
-	parentDoc.appendChild(settingsPanel);
+  parentDoc.appendChild(settingsPanel);
   parentDoc.appendChild(spacer);
 
   // parentDoc.appendChild(moodToggleCheck);
@@ -485,70 +483,70 @@ function createPetImages() {
 }
 
 function createSettingsPanel() {
-	const parentDoc = document.createElement("div");
+  const parentDoc = document.createElement("div");
 
-	const petContainer = createPetCarousel();
-	// const motivationQuestionContainer = createMotivationQuestionnaire();
+  const petContainer = createPetCarousel();
+  // const motivationQuestionContainer = createMotivationQuestionnaire();
 
-	const motivationBtn = document.createElement("button");
+  const motivationBtn = document.createElement("button");
 
-	parentDoc.style.display = "none"; 
-	parentDoc.style.backgroundColor = "white";
-	parentDoc.style.borderRadius = "5px";
-	parentDoc.style.padding = "10px";
-	parentDoc.style.marginTop = "8px";
-	parentDoc.style.color = "black";
-	parentDoc.textContent = "Settings";
-	parentDoc.style.textAlign = "center";
+  parentDoc.style.display = "none";
+  parentDoc.style.backgroundColor = "white";
+  parentDoc.style.borderRadius = "5px";
+  parentDoc.style.padding = "10px";
+  parentDoc.style.marginTop = "8px";
+  parentDoc.style.color = "black";
+  parentDoc.textContent = "Settings";
+  parentDoc.style.textAlign = "center";
 
-	motivationBtn.style.backgroundColor = colorBtn;
-	motivationBtn.style.border = "none";
-	motivationBtn.style.borderRadius = "5px";
-	motivationBtn.style.color = "white";
-	motivationBtn.style.padding = "10px";
-	motivationBtn.style.textAlign = "center";
-	motivationBtn.style.cursor = "pointer";
-	motivationBtn.style.width = "100%";
-	motivationBtn.style.marginTop = "4px";
-	motivationBtn.textContent =  "Motivation Setup";
+  motivationBtn.style.backgroundColor = colorBtn;
+  motivationBtn.style.border = "none";
+  motivationBtn.style.borderRadius = "5px";
+  motivationBtn.style.color = "white";
+  motivationBtn.style.padding = "10px";
+  motivationBtn.style.textAlign = "center";
+  motivationBtn.style.cursor = "pointer";
+  motivationBtn.style.width = "100%";
+  motivationBtn.style.marginTop = "4px";
+  motivationBtn.textContent = "Motivation Setup";
 
-	motivationBtn.addEventListener("click", () => {
-		chrome.runtime.sendMessage({ action: "openMotivation" });
-	});
+  motivationBtn.addEventListener("click", () => {
+    chrome.runtime.sendMessage({ action: "openMotivation" });
+  });
 
-	parentDoc.appendChild(petContainer);
-	parentDoc.appendChild(motivationBtn);
-	// parentDoc.appendChild(motivationQuestionContainer);
-	return parentDoc;
+  parentDoc.appendChild(petContainer);
+  parentDoc.appendChild(motivationBtn);
+  // parentDoc.appendChild(motivationQuestionContainer);
+  return parentDoc;
 }
 
-function createPetCarousel(){
-	const parentDoc = document.createElement("div");
-	parentDoc.style.width = "100%";
-	
-	const carouselWrapper = document.createElement("div");
-	carouselWrapper.style.display = "flex";
-	carouselWrapper.style.alignItems = "center";
-	carouselWrapper.style.justifyContent = "center";
-	carouselWrapper.style.gap = "6px";
-	carouselWrapper.style.backgroundColor = colorScene;
-	carouselWrapper.style.borderRadius = "5px";
+function createPetCarousel() {
+  const parentDoc = document.createElement("div");
+  parentDoc.style.width = "100%";
 
-	const prevBtn = document.createElement("button");
-	const nextBtn = document.createElement("button");
-	const selectPetBtn = document.createElement("button");
+  const carouselWrapper = document.createElement("div");
+  carouselWrapper.style.display = "flex";
+  carouselWrapper.style.alignItems = "center";
+  carouselWrapper.style.justifyContent = "center";
+  carouselWrapper.style.gap = "6px";
+  carouselWrapper.style.backgroundColor = colorScene;
+  carouselWrapper.style.borderRadius = "5px";
 
-	prevBtn.textContent = "‹";
-	nextBtn.textContent = "›";
+  const prevBtn = document.createElement("button");
+  const nextBtn = document.createElement("button");
+  const selectPetBtn = document.createElement("button");
 
-	[prevBtn, nextBtn].forEach((btn) => {
-		btn.style.background = "transparent";
-		btn.style.border = "none";
-		btn.style.color = "white";
-		btn.style.fontSize = "18px";
-		btn.style.cursor = "pointer";
-	});
-	
+  prevBtn.textContent = "‹";
+  nextBtn.textContent = "›";
+
+  [prevBtn, nextBtn].forEach((btn) => {
+    btn.style.background = "transparent";
+    btn.style.border = "none";
+    btn.style.color = "white";
+    btn.style.fontSize = "18px";
+    btn.style.cursor = "pointer";
+  });
+
   selectPetBtn.style.backgroundColor = colorBtn;
   selectPetBtn.style.border = "none";
   selectPetBtn.style.borderRadius = "5px";
@@ -560,62 +558,57 @@ function createPetCarousel(){
   selectPetBtn.style.marginTop = "4px";
   selectPetBtn.textContent = "Select Pet";
 
-	const pets = ["cat1", "cat2", "cat3", "dog1", "dog2", "dog3"];
-	let currentIndex = 0;
+  const pets = ["cat1", "cat2", "cat3", "dog1", "dog2", "dog3"];
+  let currentIndex = 0;
 
-	const img = document.createElement("img");
-	img.style.width = "60px";
-	img.style.height = "60px";
-	img.style.objectFit = "contain";
+  const img = document.createElement("img");
+  img.style.width = "60px";
+  img.style.height = "60px";
+  img.style.objectFit = "contain";
 
-	function updateCarouselImage() {
-		paths = getAnimalPaths();
-		const pet = pets[currentIndex];
-		img.src = paths[pet].normal;
-	}
+  function updateCarouselImage() {
+    paths = getAnimalPaths();
+    const pet = pets[currentIndex];
+    img.src = paths[pet].normal;
+  }
 
-	nextBtn.addEventListener("click", () => {
-		currentIndex = (currentIndex + 1) % pets.length;
-		updateCarouselImage();
-	});
+  nextBtn.addEventListener("click", () => {
+    currentIndex = (currentIndex + 1) % pets.length;
+    updateCarouselImage();
+  });
 
-	prevBtn.addEventListener("click", () => {
-		currentIndex = (currentIndex - 1 + pets.length) % pets.length;
-		updateCarouselImage();
-	});
+  prevBtn.addEventListener("click", () => {
+    currentIndex = (currentIndex - 1 + pets.length) % pets.length;
+    updateCarouselImage();
+  });
 
+  selectPetBtn.addEventListener("click", async () => {
+    const selectedPet = pets[currentIndex];
 
-	selectPetBtn.addEventListener("click", async () => {
-		const selectedPet = pets[currentIndex];
+    await chrome.storage.local.set({ selectedPet });
 
-		await chrome.storage.local.set({ selectedPet });
+    console.log("Selected pet:", selectedPet);
+  });
 
-		console.log("Selected pet:", selectedPet);
-	});
+  chrome.storage.local.get(["selectedPet"], (result) => {
+    if (result.selectedPet) {
+      const index = pets.indexOf(result.selectedPet);
+      if (index !== -1) {
+        currentIndex = index;
+      }
+    }
 
-	chrome.storage.local.get(["selectedPet"], (result) => {
-		if (result.selectedPet) {
-			const index = pets.indexOf(result.selectedPet);
-			if (index !== -1) {
-				currentIndex = index;
-			}
-		}
+    updateCarouselImage();
+  });
 
-		updateCarouselImage();
-	});
+  carouselWrapper.appendChild(prevBtn);
+  carouselWrapper.appendChild(img);
+  carouselWrapper.appendChild(nextBtn);
 
-	carouselWrapper.appendChild(prevBtn);
-	carouselWrapper.appendChild(img);
-	carouselWrapper.appendChild(nextBtn);
-
-	parentDoc.appendChild(carouselWrapper);
-	parentDoc.appendChild(selectPetBtn);
-	return parentDoc;
-
+  parentDoc.appendChild(carouselWrapper);
+  parentDoc.appendChild(selectPetBtn);
+  return parentDoc;
 }
-
-
-
 
 function createToDoList() {
   motivationCheck();
@@ -948,32 +941,28 @@ function getMotivationContext() {
 //LLM stuff
 async function GetMotivation() {
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text:
-                    "You are an encouraging virtual pet. Give a short 1-2 sentence motivational message to a student who is behind on their assignments. Respond in an undergraduate student's tone" +
-                    getMotivationContext(),
-                },
-              ],
-            },
-          ],
-        }),
-      }
-    );
+    const response = await fetch("https://api.ai.it.ufl.edu/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${CONFIG.LITELLM_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-instruct",
+        messages: [
+          {
+            role: "user",
+            content:
+              "You are an encouraging virtual pet. Give a short 1-2 sentence motivational message to a student who is behind on their assignments. Respond in an undergraduate student's tone" +
+              getMotivationContext(),
+          },
+        ],
+      }),
+    });
 
     const data = await response.json();
-    console.log("Gemini response:", data);
-    return data.candidates[0].content.parts[0].text;
+    console.log("LiteLLM response:", data);
+    return data.choices[0].message.content;
   } catch (error) {
     console.error("LLM Error:", error);
     return "You got this!";
@@ -983,33 +972,28 @@ async function GetMotivation() {
 // Helper to display why an assignment is important based on its details (e.g. due date, course, etc.)
 async function determineWhyImportant(assignment) {
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${CONFIG.GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text:
-                    `Given the following assignment details, explain in 1-2 sentences why this assignment might be important for a student to complete:\n\nTitle: ${assignment.title}\nCourse: ${assignment.course}\nDue Date: ${assignment.dueAt}\nRespond in a undergraduate student's tone` +
-                    getMotivationContext(),
-                },
-              ],
-            },
-          ],
-        }),
-      }
-    );
+    const response = await fetch("https://api.ai.it.ufl.edu/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${CONFIG.LITELLM_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-instruct",
+        messages: [
+          {
+            role: "user",
+            content:
+              `Given the following assignment details, explain in 1-2 sentences why this assignment might be important for a student to complete:\n\nTitle: ${assignment.title}\nCourse: ${assignment.course}\nDue Date: ${assignment.dueAt}\nRespond in an undergraduate student's tone` +
+              getMotivationContext(),
+          },
+        ],
+      }),
+    });
 
     const data = await response.json();
-
-    console.log("Gemini importance response:", data);
-    return data.candidates[0].content.parts[0].text;
+    console.log("LiteLLM importance response:", data);
+    return data.choices[0].message.content;
   } catch (error) {
     console.error("LLM Error:", error);
     return "This assignment is important for your learning and success in the course!";
