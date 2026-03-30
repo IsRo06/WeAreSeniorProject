@@ -57,6 +57,12 @@ const PATHS = {
     hungry: "/Images/Dog/Dog3Hungry.gif",
     eating: "/Images/Dog/Dog3Eating.gif",
   },
+  axolotl: {
+    normal: "/Images/Axolotl/AxolotlWag.gif",
+    happy: "/Images/Axolotl/AxolotlHappy.gif",
+    hungry: "/Images/Axolotl/AxolotlHungry.gif",
+    eating: "/Images/Axolotl/AxolotlEating.gif",
+  },
 };
 
 function refreshImage() {
