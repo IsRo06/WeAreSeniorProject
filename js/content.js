@@ -818,7 +818,7 @@ function motivationCheck() {
 
   if (total === 0) return 0;
 
-  return (completedAssignmentsCurrentWeek.length / total) * 100;
+  return Math.round((completedAssignmentsCurrentWeek.length / total) * 100);
 }
 
 function createPetStats() {
