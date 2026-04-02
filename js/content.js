@@ -349,7 +349,7 @@ function createPetImages() {
     motivationMsg.textContent = "You can do it!";
   } else {
     motivationMsg.textContent =
-      "Please set up Canvas Pets with your motivations in the pop up!";
+      "Please set up Canvas Pets with your motivations in the Settings!";
   }
 
   motivationMsg.id = "pet-motivation-msg";
@@ -941,7 +941,7 @@ function getMotivationContext() {
 
   console.log("Motivation questionnaire summary for LLM context: ", summary);
 
-  return `\n\nThe student answered a motivation questionnaire (1=disagree, 5=agree):\n${summary}\nAnalyze and mention" these to encourage the student and make the motivation message more personalized.`;
+  return `\n\nThe student answered a motivation questionnaire (1=disagree, 5=agree):\n${summary}\n Use one of the answers with high agreeance to encourage the student and make the motivation message more personalized. Be subtle including the responses from the summary, use them as a reference for the message but keep it natural but not as the main point`;
 }
 
 //LLM stuff
@@ -959,8 +959,9 @@ async function GetMotivation() {
           {
             role: "user",
             content:
-              "You are an encouraging virtual pet. Give a short 1-2 sentence motivational message to a student who is behind on their assignments. Respond in an undergraduate student's tone" +
-              getMotivationContext(),
+              "You are an encouraging virtual pet. Give a short  NO MORE THAN  a 50 words,  1 sentence motivational message to an undergraduate student who needs motivation. Prioritize using casual language, sounding re affirming and natural, avoid using the term you are crushing it" +
+              getMotivationContext() +
+              "read the message to yourself if it doesn't sound natural do another message until it sounds natural",
           },
         ],
       }),
